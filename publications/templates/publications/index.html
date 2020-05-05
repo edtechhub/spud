@@ -1,0 +1,202 @@
+{% load static %}
+{% load publications_extras %}
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>
+      ETH SPuD - {{ tak }} - with {{ with_filter }}; page {{ publications.number }}
+
+      {% if year %}
+        ; {{ year }}
+      {% endif %}
+    </title>
+
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+
+
+    <link rel="stylesheet" type="text/css" href="{% static 'css/publications.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
+
+  </head>
+
+  <body>
+
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+      <a class="navbar-brand" href="/?limit=50&auth={{ auth }}">EdTechHub Searchable Publications Database</a>
+    </nav>
+
+    <main role="main" class="container-fluid" style="margin-top: 50px;">
+
+      <form action="{% url 'index' %}" method="GET" class="mb-3">
+        <input name="limit" type="hidden" value="{{ limit }}">
+        <input name="auth" type="hidden" value="{{ auth }}">
+        <div class="form-row">
+
+          <div class="col-md-2">
+            <input type="text" class="form-control" name="year" value="{{ year }}" placeholder="year">
+          </div>
+
+          <div class="col-md-7">
+            <input type="text" class="form-control" name="tak" value="{{ tak }}" placeholder="query">
+          </div>
+
+          <div class="col-md-2">
+            <select class="form-control" name="with">
+              <option value="None"> None </option>
+              {% for k in WITH_FILTERS %}
+                {% if with_filter|lower == k|lower %}
+                  <option value="{{ k }}" selected="selected"> {{ k }} </option>
+                {% else %}
+                  <option value="{{ k }}"> {{ k }} </option>
+                {% endif %}
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-md-1">
+            <button type="submit" class="btn btn-primary"> Filter </button>
+          </div>
+
+        </div>
+      </form>
+
+      <div class="row mb-2">
+
+        <div class="col-md-6">
+          <p class="b"> Total Records: <span class="font-weight-bold"> {{ total_records }} </span> </p>
+        </div>
+
+        <div class="col-md-2 text-right offset-md-2">
+          <button type="button" class="btn btn-warning text-white" id="btn-mark-now" data-toggle="tooltip" data-placement="top" title="Click to highlight key words and search terms. Note that this will momentarily slow down this page.">
+            <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+            Mark Now
+          </button>
+        </div>
+
+        <div class="col-md-2 text-left">
+          <div class="custom-control custom-checkbox mt-1" data-toggle="tooltip" data-placement="top" title="Click to highlight key words and search terms. Note that this will momentarily slow down this page." style="cursor: pointer;">
+              <input type="checkbox" class="custom-control-input" id="chkbx-mark_always">
+              <label class="custom-control-label" for="chkbx-mark_always"> Mark Always </label>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="row mt-6">
+        <div class="col-md-12">
+
+          <table class="table table-bordered">
+            <thead>
+              <tr class="text-center d-flex">
+                <th class="col-2"> Authors </th>
+                <th class="col-1"> Year </th>
+                <th class="col-2"> Title </th>
+                <th class="col-4"> Abstract </th>
+                <th class="col-2"> Keywords </th>
+                <th class="col-1"> Links </th>
+                <th class="col-1"> ID </th>
+              </tr>
+            </thead>
+
+            {% for publication in publications %}
+              <tr class="text-justify d-flex">
+                <td class="col-2"> {{ publication.authors }} </td>
+                <td class="col-1"> {{ publication.year }} </td>
+                <td class="col-2 highlighter">
+                  <a href="{% url 'showrecord'%}?auth={{ auth }}&importedfrom={{ publication.get_persisted_id | urlencode }}" target="_blank">
+                    {{ publication.title }}
+                  </a>
+                </td>
+                <td class="col-4 highlighter"> {{ publication.abstract }} </td>
+                <td class="col-2 highlighter wrap"> {{ publication.keywords }} </td>
+                <td class="col-1 wrap">
+                  {% if publication.doi %}
+                    <a href="https://doi.org/{{ publication.doi }}" target="_blank"> {{ publication.doi }} </a>
+                    <br><br>
+                  {% endif %}
+
+                  <a href="https://scholar.google.co.uk/scholar?q={{ publication.title }}" target="_blank">
+                    Google Scholar
+                  </a>
+                </td>
+                <td class="col-1 wrap font6">
+                  {{ publication.get_persisted_id }}
+                </td>
+              </tr>
+            {% endfor %}
+            
+          </table>
+
+          <div class="d-flex">
+            <ul class="pagination mx-auto">
+
+              {% if publications.has_previous %}
+              <li class="page-item">
+                  <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Previous">
+                    <span aria-hidden="true">first</span>
+                  </a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ publications.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                  </a>
+                </li>
+              {% endif %}
+
+              {% for n in publications.paginator.page_range %}
+                {% if publications.number == n %}
+                  <li class="page-item active">
+                    <span class="page-link">{{ n }}<span class="sr-only">(current)</span></span>
+                  </li>
+                {% elif n > publications.number|add:'-5' and n < publications.number|add:'5' %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ n }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ n }}</a>
+                  </li>
+                {% endif %}
+              {% endfor %}
+
+              {% if publications.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ publications.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                  </a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ publications.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Next">
+                    <span aria-hidden="true">last</span>
+                  </a>
+                </li>
+              {% endif %}
+            </ul>
+          </div>
+
+          <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+            Show Query
+          </button>
+          <br><br>
+          <div class="collapse" id="collapseExample">
+            <p class="b"> Query: <span class="font-weight-bold"> {{ q__q }} </span> </p>
+            <p class="b"> Timestamp: <span class="font-weight-bold"> {{ ""|timestamp }} </span> </p>
+          </div>
+
+        </div>
+      </div>
+    </main>
+
+    <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+    <!-- <script src="{% static 'js/jquery-3.4.1.slim.min.js' %}"></script> -->
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/jquery.cookie.min.js' %}"></script>
+    <script src="{% static 'js/jquery.mark.js' %}"></script>
+
+    <script src="{% static 'js/publications.js' %}"></script>
+
+  </body>
+</html>

@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>ETH SPuD - {{ publication.get_persisted_id }}</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+
+    {% load static %}
+
+    <link rel="stylesheet" type="text/css" href="{% static 'css/publications.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
+
+  </head>
+
+  <body>
+
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+      <a class="navbar-brand" href="/?limit=50&auth={{ auth }}">EdTechHub Searchable Publications Database</a>
+    </nav>
+
+    <main role="main" class="container-fluid" style="margin-top: 70px;">
+
+      <div class="row">
+        <div class="col-md-10 text-justify">
+          <h2> {{ publication.title }} </h2>
+        </div>
+
+        <div class="col-2 text-right">
+          <form action="{% url 'ris_export' %}" method="POST">
+            {% csrf_token %}
+            <input name="auth" type="hidden" value="{{ auth }}">
+            <input name="importedfrom" type="hidden" value="{{ publication.get_persisted_id }}">
+
+            <button class="btn btn-secondary"> Export as RIS </button>
+          </form>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12">
+
+          <!-- evey field here should be present is RIS export -->
+
+          <table class="table table-bordered">
+            <tr class="d-flex">
+              <th class="col-2"> Persistent ID </th>
+              <td class="col-10 text-justify"> {{ publication.get_persisted_id }} </td>
+            </tr>
+            <tr class="d-flex">
+              <th class="col-2"> Year </th>
+              <td class="col-10 text-justify"> {{ publication.year }} </td>
+            </tr>
+            <tr class="d-flex">
+              <th class="col-2"> Title </th>
+              <td class="col-10 text-justify"> {{ publication.title }} </td>
+            </tr>
+            <tr class="d-flex">
+              <th class="col-2"> Authors </th>
+              <td class="col-10 text-justify"> {{ publication.authors }} </td>
+            </tr>
+            <tr class="d-flex">
+              <th class="col-2"> Abstract </th>
+              <td class="col-10 text-justify"> {{ publication.abstract }} </td>
+            </tr>
+            <tr class="d-flex">
+              <th class="col-2"> Keywords </th>
+              <td class="col-10 text-justify"> {{ publication.keywords }} </td>
+            </tr>
+            <tr class="d-flex">
+              <th class="col-2"> Identifier </th>
+              <td class="col-10 text-justify"> {{ publication.identifier }} </td>
+            </tr>
+            <tr class="d-flex">
+              <th class="col-2"> ISBN </th>
+              <td class="col-10 text-justify"> {{ publication.isbn }} </td>
+            </tr>
+            <tr class="d-flex">
+              <th class="col-2"> Publication Type </th>
+              <td class="col-10 text-justify"> {{ publication.publicationtype }} </td>
+            </tr>
+            <tr class="d-flex">
+              <th class="col-2"> DOI </th>
+              <td class="col-10 text-justify">
+                <a href="https://doi.org/{{ publication.doi }}" target="_blank"> {{ publication.doi }} </a>
+             </td>
+            </tr>
+            <tr class="d-flex">
+              <th class="col-2"> Publisher Date Copy Right </th>
+              <td class="col-10 text-justify"> {{ publication.publisherdatecopyright }} </td>
+            </tr>
+            <tr class="d-flex">
+              <th class="col-2"> Item Data Type </th>
+              <td class="col-10 text-justify"> {{ publication.itemdatatype }} </td>
+            </tr>
+            <tr class="d-flex">
+              <th class="col-2"> Links </th>
+              <td class="col-10 text-justify">
+                  <a href="https://scholar.google.co.uk/scholar?q={{ publication.title }}" target="_blank">
+                    Google Scholar
+                  </a>
+             </td>
+            </tr>
+            <tr class="d-flex">
+              <th class="col-2"> Citation </th>
+              <td class="col-10 text-justify"> {{ publication.citation }} </td>
+            </tr>
+            <tr class="d-flex">
+              <th class="col-2"> Item Data Handler </th>
+              <td class="col-10 text-justify"> {{ publication.itemdatahandler }} </td>
+            </tr>
+            <tr class="d-flex">
+              <th class="col-2"> Additional Titles </th>
+              <td class="col-10 text-justify"> {{ publication.additionaltitles }} </td>
+            </tr>
+            <tr class="d-flex">
+              <th class="col-2"> Container Name </th>
+              <td class="col-10 text-justify"> {{ publication.containername }} </td>
+            </tr>
+            <tr class="d-flex">
+              <th class="col-2"> Location </th>
+              <td class="col-10 text-justify"> {{ publication.location }} </td>
+            </tr>
+            <tr class="d-flex">
+              <th class="col-2"> Author100 </th>
+              <td class="col-10 text-justify"> {{ publication.author100 }} </td>
+            </tr>
+            <tr class="d-flex">
+              <th class="col-2"> Date Range </th>
+              <td class="col-10 text-justify"> {{ publication.daterange }} </td>
+            </tr>
+            <tr class="d-flex">
+              <th class="col-12"> Record Meta Data </th>
+            </tr>
+            <tr class="d-flex">
+              <th class="col-2"> Zbua Major Version </th>
+              <td class="col-10 text-justify"> {{ publication.recordmetadata_zbuamajorversion }} </td>
+            </tr>
+            <tr class="d-flex">
+              <th class="col-2"> Date Retrieved </th>
+              <td class="col-10 text-justify"> {{ publication.recordmetadata_dateretrieved }} </td>
+            </tr>
+            <tr class="d-flex">
+              <th class="col-2"> Date Converted </th>
+              <td class="col-10 text-justify"> {{ publication.recordmetadata_dateconverted }} </td>
+            </tr>
+            <tr class="d-flex">
+              <th class="col-2"> Record Type </th>
+              <td class="col-10 text-justify"> {{ publication.recordmetadata_recordtype }} </td>
+            </tr>
+            <tr class="d-flex">
+              <th class="col-2"> Source </th>
+              <td class="col-10 text-justify"> {{ publication.recordmetadata_source }} </td>
+            </tr>
+            <tr class="d-flex">
+              <th class="col-2"> Record Name </th>
+              <td class="col-10 text-justify"> {{ publication.recordmetadata_recordname }} </td>
+            </tr>
+            <tr class="d-flex">
+              <th class="col-2"> Search GUID </th>
+              <td class="col-10 text-justify"> {{ publication.recordmetadata_searchguid }} </td>
+            </tr>
+            <tr class="d-flex">
+              <th class="col-2"> Number in Source </th>
+              <td class="col-10 text-justify"> {{ publication.recordmetadata_numberinsource }} </td>
+            </tr>
+            <tr class="d-flex">
+              <th class="col-2"> Zbua Minor Version </th>
+              <td class="col-10 text-justify"> {{ publication.recordmetadata_zbuaminorversion }} </td>
+            </tr>
+          </table>
+          
+        </div>
+      </div>
+    </main>
+
+    <script src="{% static 'js/jquery-3.4.1.slim.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+
+  </body>
+</html>
