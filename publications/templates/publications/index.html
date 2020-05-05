@@ -32,14 +32,13 @@
     </nav>
 
     <main role="main" class="container-fluid" style="margin-top: 50px;">
-
       <form action="{% url 'index' %}" method="GET" class="mb-3">
         <input name="limit" type="hidden" value="{{ limit }}">
         <input name="auth" type="hidden" value="{{ auth }}">
         <div class="form-row">
 
           <div class="col-md-2">
-            <input type="text" class="form-control" name="year" value="{{ year }}" placeholder="year">
+            <input type="number" step="1" class="form-control" name="year" value="{{ year }}" placeholder="year">
           </div>
 
           <div class="col-md-7">
@@ -130,7 +129,7 @@
                 </td>
               </tr>
             {% endfor %}
-            
+
           </table>
 
           <div class="d-flex">
