@@ -26,7 +26,7 @@ $(function() {
     var url = new URL(window.location);
     var auth = url.searchParams.get("auth");
 
-    if (!auth || auth == "777777")
+    if (!auth || auth == undefined)
       return;
 
     // highlight search terms
