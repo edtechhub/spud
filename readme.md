@@ -64,6 +64,14 @@ source venv/bin/activate
 - Auth token is rquired to access application which you can get from admin. If not used you will get `401 Unauthorized` error
 
 
+### Highlighting feature
+
+To add new keywords in old categories, expand the Python lists in the settings.py file with new additional keywords.
+
+To add new keyword categories:
+- Add desired keywords as a Python dictionary in the settings.py file
+- Add new CSS highlighting in publications.css in the format .highlighted(your_keyword)
+
 ## MIT License
 
 
