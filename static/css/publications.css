@@ -7,17 +7,17 @@ body {
 	font-size: 16px !important;
 }
 
-.markCountries {
-  background: yellow;
-  color: black;
-}
-
-.markRegions {
+.highlightedCountries {
   background: purple;
   color: white;
 }
 
-.markDterms {
+.highlightedRegions {
+  background: purple;
+  color: white;
+}
+
+.highlightedDterms {
   background: blue;
   color: white;
 }

@@ -26,42 +26,10 @@ $(function() {
     var url = new URL(window.location);
     var auth = url.searchParams.get("auth");
 
-    if (!auth || auth == undefined)
+    if (!auth || auth == "777777")
       return;
 
-    $.ajax({
-      url: "/keywords?auth=" + auth,
-
-      type: 'GET',
-      cache: false,
-
-      success: function (data, status, xhr) {
-        var instance = new Mark($("td.highlighter"));
-        instance.mark(data.countries, {
-            "className": "markCountries",
-            "separateWordSearch": false,
-            "accuracy": "complementary",
-            "caseSensitive": true,
-        });
-        instance.mark(data.regions, {
-            "className": "markRegions",
-            "separateWordSearch": false,
-            "accuracy": "complementary",
-            "caseSensitive": true,
-        });
-        instance.mark(data.development_terms, {
-            "className": "markDterms",
-            "separateWordSearch": false,
-            "accuracy": "complementary",
-            "caseSensitive": true,
-        });
-      },
-      error: function (jqXhr, textStatus, errorMessage) {
-        alert("Issue while working with markjs");
-      }
-    });
-
-    // highligh search terms
+    // highlight search terms
     var query = $(".form-row input[name='tak']").val();
     var search_terms = query.replace(/'/g, "").replace(/AND/g, " ").split(" ");
     search_terms = search_terms.filter(function(v){return v !== ''});
