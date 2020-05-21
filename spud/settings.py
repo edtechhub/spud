@@ -14,7 +14,9 @@ import os
 import logging
 
 import environ
-env = environ.Env()
+env = environ.Env(
+    ALLOWED_HOSTS=(list, ['127.0.0.1', 'localhost']),
+)
 environ.Env.read_env()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -52,8 +54,7 @@ LOGGING = {
     },
 }
 
-ALLOWED_HOSTS = ["127.0.0.1", "localhost"].append(env("ALLOWED_HOSTS"))
-
+ALLOWED_HOSTS = env("ALLOWED_HOSTS")
 
 # Application definition
 
