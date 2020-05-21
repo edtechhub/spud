@@ -106,15 +106,19 @@
 
             {% for publication in publications %}
               <tr class="text-justify d-flex">
-                <td class="col-2"> {{ publication.authors }} </td>
+                <td class="col-2"> {{ publication.authors|check_availablity }} </td>
                 <td class="col-1"> {{ publication.year }} </td>
                 <td class="col-2 highlighter">
                   <a href="{% url 'showrecord'%}?auth={{ auth }}&importedfrom={{ publication.get_persisted_id | urlencode }}" target="_blank">
-                    {{ publication.title|replace_highlighted }}
+                    {{ publication.title|check_availablity|replace_highlighted }}
                   </a>
                 </td>
-                <td class="col-4 highlighter"> {{ publication.abstract|replace_highlighted }} </td>
-                <td class="col-2 highlighter wrap"> {{ publication.keywords|replace_highlighted }} </td>
+                <td class="col-4 highlighter">
+                  {{ publication.abstract|check_availablity|replace_highlighted }}
+                </td>
+                <td class="col-2 highlighter wrap">
+                  {{ publication.keywords|check_availablity|replace_highlighted }}
+                </td>
                 <td class="col-1 wrap">
                   {% if publication.doi %}
                     <a href="https://doi.org/{{ publication.doi }}" target="_blank"> {{ publication.doi }} </a>
