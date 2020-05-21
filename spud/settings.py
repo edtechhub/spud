@@ -245,4 +245,10 @@ REGIONS = ["Africa","Arab world","Asia-Pacific","Caribbean","Central Africa","Ce
 
 DEVELOPMENT_TERMS = ["conflict affected areas","conflict-affected areas","conflict affected regions","conflict-affected regions","conflict zones","developing context","developing countries","developing country","developing economies","developing economy","developing market countries","developing market country","developing markets","developing nation","developing region","developing state","developing world","emergent nation","emergent nations","emerging economies","emerging market countries","emerging market country","emerging nation","emerging world","fragile and conflict affected areas","fragile and conflict affected regions","fragile areas","fragile state","fragile contexts","fragile regions","Global South","growing economies","less developed countries","less developed country","low and middle income countries","low income countries","low income country","low income environment","low resource countries","low resource country","low resource environment","low-income countries","low-income country","low-income environment","low-resource countries","low-resource country","low-resource environment","middle-income country","middle-income country","middle-income country","middle-income environment","middle income environment","third world","third-world","under developed countries","under developed country","under-developed countries","under-developed country","underdeveloped countries","underdeveloped country","under-developed nation","under developed nation","underdeveloped nation"]
 
+KEYWORDS = {
+"Countries": COUNTRIES,
+"Regions": REGIONS,
+"Dterms": DEVELOPMENT_TERMS
+}
+
 AUTH_KEY = env("AUTH_KEY")

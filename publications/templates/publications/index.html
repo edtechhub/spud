@@ -1,5 +1,6 @@
 {% load static %}
 {% load publications_extras %}
+{% load highlighter %}
 
 <!doctype html>
 <html lang="en">
@@ -32,14 +33,13 @@
     </nav>
 
     <main role="main" class="container-fluid" style="margin-top: 50px;">
-
       <form action="{% url 'index' %}" method="GET" class="mb-3">
         <input name="limit" type="hidden" value="{{ limit }}">
         <input name="auth" type="hidden" value="{{ auth }}">
         <div class="form-row">
 
           <div class="col-md-2">
-            <input type="text" class="form-control" name="year" value="{{ year }}" placeholder="year">
+            <input type="number" step="1" class="form-control" name="year" value="{{ year }}" placeholder="year">
           </div>
 
           <div class="col-md-7">
@@ -110,11 +110,11 @@
                 <td class="col-1"> {{ publication.year }} </td>
                 <td class="col-2 highlighter">
                   <a href="{% url 'showrecord'%}?auth={{ auth }}&importedfrom={{ publication.get_persisted_id | urlencode }}" target="_blank">
-                    {{ publication.title }}
+                    {{ publication.title|replace_highlighted }}
                   </a>
                 </td>
-                <td class="col-4 highlighter"> {{ publication.abstract }} </td>
-                <td class="col-2 highlighter wrap"> {{ publication.keywords }} </td>
+                <td class="col-4 highlighter"> {{ publication.abstract|replace_highlighted }} </td>
+                <td class="col-2 highlighter wrap"> {{ publication.keywords|replace_highlighted }} </td>
                 <td class="col-1 wrap">
                   {% if publication.doi %}
                     <a href="https://doi.org/{{ publication.doi }}" target="_blank"> {{ publication.doi }} </a>
@@ -130,7 +130,7 @@
                 </td>
               </tr>
             {% endfor %}
-            
+
           </table>
 
           <div class="d-flex">
