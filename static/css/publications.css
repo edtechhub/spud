@@ -1,5 +1,5 @@
 body {
-  font-family: Montserrat !important;
+	font-family: Montserrat !important;
 }
 
 .navbar {
@@ -8,23 +8,58 @@ body {
 }
 
 .markCountries {
-  background: yellow;
-  color: black;
+	background: yellow;
+	color: black;
 }
 
 .markRegions {
-  background: purple;
-  color: white;
+	background: purple;
+	color: white;
 }
 
 .markDterms {
-  background: blue;
-  color: white;
+	background: blue;
+	color: white;
 }
 
 .markSearchTerms {
-  background: green;
-  color: white;
+	background: green;
+	color: white;
+}
+
+.markTechTerms {
+	background: #9B2335;
+	color: white;
+}
+
+.markEducationalTerms {
+	background: #EFC050;
+	color: white;
+}
+
+.markPopulation1 {
+	background: #DD4124;
+	color: white;
+}
+
+.markPopulation2 {
+	background: #009B77;
+	color: white;
+}
+
+.markOrganizations {
+	background: #955251;
+	color: white;
+}
+
+.markFocus {
+	background: #C3447A;
+	color: white;
+}
+
+.markResearch {
+	background: #88B04B;
+	color: white;
 }
 
 .wrap {
@@ -36,5 +71,5 @@ body {
 }
 
 .tooltip-inner {
-    max-width: 200px !important; //define whatever width you want
+	max-width: 200px !important;
 }
