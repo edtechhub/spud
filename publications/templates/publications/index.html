@@ -1,6 +1,7 @@
 {% load static %}
 {% load publications_extras %}
 {% load highlighter %}
+{% load humanize %}
 
 <!doctype html>
 <html lang="en">
@@ -20,9 +21,9 @@
 
     <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
 
-
     <link rel="stylesheet" type="text/css" href="{% static 'css/publications.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap4-toggle.min.css' %}">
 
   </head>
 
@@ -69,17 +70,21 @@
       <div class="row mb-2">
 
         <div class="col-md-6">
-          <p class="b"> Total Records: <span class="font-weight-bold"> {{ total_records }} </span> </p>
+          <p class="b">
+            Matching records:
+            <span class="font-weight-bold"> {{ total_matched_records|intcomma }} </span>
+            (out of {{ total_records|intcomma }} records)
+          </p>
         </div>
 
-        <div class="col-md-2 text-right offset-md-2">
+        <div class="col-md-2 text-right offset-md-2 d-none">
           <button type="button" class="btn btn-warning text-white" id="btn-mark-now" data-toggle="tooltip" data-placement="top" title="Click to highlight key words and search terms. Note that this will momentarily slow down this page.">
             <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
             Mark Now
           </button>
         </div>
 
-        <div class="col-md-2 text-left">
+        <div class="col-md-2 text-left d-none">
           <div class="custom-control custom-checkbox mt-1" data-toggle="tooltip" data-placement="top" title="Click to highlight key words and search terms. Note that this will momentarily slow down this page." style="cursor: pointer;">
               <input type="checkbox" class="custom-control-input" id="chkbx-mark_always">
               <label class="custom-control-label" for="chkbx-mark_always"> Mark Always </label>
@@ -197,6 +202,7 @@
     <!-- <script src="{% static 'js/jquery-3.4.1.slim.min.js' %}"></script> -->
     <script src="{% static 'js/popper.min.js' %}"></script>
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap4-toggle.min.js' %}"></script>
     <script src="{% static 'js/jquery.cookie.min.js' %}"></script>
     <script src="{% static 'js/jquery.mark.js' %}"></script>
 
