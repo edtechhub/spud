@@ -32,6 +32,8 @@ def index(request):
 
 	if with_filter: q_with = formulate_with_filter_query(with_filter)
 
+	total_records = Publication.objects.count()
+
 	publications_list = Publication.objects.filter(q_year & (q_tak) & (q_with)).order_by('-year')
 
 	per_page = request.GET.get('limit', 50)
@@ -39,7 +41,7 @@ def index(request):
 		publications = publications_list.all()
 		q__q = connection.queries[-1]["sql"]
 
-		total_records = len(publications)
+		total_matched_records = len(publications)
 	else:
 		paginator = Paginator(publications_list, per_page)
 		page_number = request.GET.get('page')
@@ -47,11 +49,12 @@ def index(request):
 
 		q__q = connection.queries[-1]["sql"]
 
-		total_records = publications.paginator.count
+		total_matched_records = publications.paginator.count
 
 	context = {
 		'publications': publications,
 		'total_records': total_records,
+		'total_matched_records': total_matched_records,
 		'year': year,
 		'tak': tak,
 		'limit': per_page,
