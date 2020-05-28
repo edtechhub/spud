@@ -34,6 +34,14 @@ function AbstractReadMore() {
 			else {
 				updatedCarLmt = carLmt;
 				firstSet = allstr.substring(0, updatedCarLmt);
+
+				spanOpenCount = (firstSet.match(/<span/g) || []).length;
+				spanCloseCount = (firstSet.match(/<\/span>/g) || []).length;
+				if (spanOpenCount > spanCloseCount) {
+					updatedCarLmt = allstr.indexOf("</span>", updatedCarLmt) + 7;
+
+					firstSet = allstr.substring(0, updatedCarLmt);
+				}
 			}
 
 			var secdHalf = allstr.substring(updatedCarLmt, allstr.length);

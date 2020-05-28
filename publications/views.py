@@ -36,7 +36,7 @@ def index(request):
 
 	publications_list = Publication.objects.filter(q_year & (q_tak) & (q_with)).order_by('-year')
 
-	per_page = request.GET.get('limit', 10)
+	per_page = request.GET.get('limit', 50)
 	if int(per_page) == 0:
 		publications = publications_list.all()
 		q__q = connection.queries[-1]["sql"]
