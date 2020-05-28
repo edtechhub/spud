@@ -3,12 +3,7 @@ $(function() {
 	$("[data-toggle=tooltip]").tooltip();
 
 	AbstractReadMore();
-	if ($.cookie("abridged_abstracts") == "true")
-		$("#abstract-toggle-btn").bootstrapToggle("on");
-		// $("#abstract-toggle-btn").prop("checked", true);
-	else
-		$("#abstract-toggle-btn").bootstrapToggle("off");
-		// $("#abstract-toggle-btn").prop("checked", false);
+	$("#abstract-toggle-btn").bootstrapToggle(($.cookie("abridged_abstracts") == "true") ? "on" : "off");
 	toggleAbstractText();
 
 	$("#abstract-toggle-btn").on("change", function() {
@@ -23,11 +18,17 @@ $(function() {
 			$(".SecSec").hide();
 			$(".readMore").show();
 			$(".readLess").hide();
+
+			$(".addReadMore").removeClass("showmorecontent");
+			$(".addReadMore").addClass("showlesscontent");
 		}
 		else {
 			$(".SecSec").show();
 			$(".readMore").hide();
 			$(".readLess").show();
+
+			$(".addReadMore").removeClass("showlesscontent");
+			$(".addReadMore").addClass("showmorecontent");
 		}
 	}
 
