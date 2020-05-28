@@ -1,7 +1,39 @@
 $(function() {
 
-	$('[data-toggle=tooltip]').tooltip();
+	$("[data-toggle=tooltip]").tooltip();
 
+	AbstractReadMore();
+	$("#abstract-toggle-btn").bootstrapToggle(($.cookie("abridged_abstracts") == "true") ? "on" : "off");
+	toggleAbstractText();
+
+	$("#abstract-toggle-btn").on("change", function() {
+		var hide_abstract = $(this).prop("checked");
+		$.cookie("abridged_abstracts", hide_abstract);
+
+		toggleAbstractText();
+	});
+
+	function toggleAbstractText() {
+		if ($.cookie("abridged_abstracts") == "true") {
+			$(".SecSec").hide();
+			$(".readMore").show();
+			$(".readLess").hide();
+
+			$(".addReadMore").removeClass("showmorecontent");
+			$(".addReadMore").addClass("showlesscontent");
+		}
+		else {
+			$(".SecSec").show();
+			$(".readMore").hide();
+			$(".readLess").show();
+
+			$(".addReadMore").removeClass("showlesscontent");
+			$(".addReadMore").addClass("showmorecontent");
+		}
+	}
+
+
+	/*
 	if ($.cookie('mark_always_flag') == "true") {
 		$("#chkbx-mark_always").prop("checked", true);
 		highlightFeaturedTerms();
@@ -29,38 +61,38 @@ $(function() {
 		if (!auth || auth == undefined)
 			return;
 
-		// server side tagging has been operational - so we do not need this at the moment
-		// $.ajax({
-		// 	url: "/keywords?auth=" + auth,
+		server side tagging has been operational - so we do not need this at the moment
+		$.ajax({
+			url: "/keywords?auth=" + auth,
 
-		// 	type: 'GET',
-		// 	cache: false,
+			type: 'GET',
+			cache: false,
 
-		// 	success: function (data, status, xhr) {
-		// 		var instance = new Mark($("td.highlighter"));
-		// 		instance.mark(data.countries, {
-		// 				"className": "markCountries",
-		// 				"separateWordSearch": false,
-		// 				"accuracy": "complementary",
-		// 				"caseSensitive": true,
-		// 		});
-		// 		instance.mark(data.regions, {
-		// 				"className": "markRegions",
-		// 				"separateWordSearch": false,
-		// 				"accuracy": "complementary",
-		// 				"caseSensitive": true,
-		// 		});
-		// 		instance.mark(data.development_terms, {
-		// 				"className": "markDterms",
-		// 				"separateWordSearch": false,
-		// 				"accuracy": "complementary",
-		// 				"caseSensitive": true,
-		// 		});
-		// 	},
-		// 	error: function (jqXhr, textStatus, errorMessage) {
-		// 		alert("Issue while working with markjs");
-		// 	}
-		// });
+			success: function (data, status, xhr) {
+				var instance = new Mark($("td.highlighter"));
+				instance.mark(data.countries, {
+						"className": "markCountries",
+						"separateWordSearch": false,
+						"accuracy": "complementary",
+						"caseSensitive": true,
+				});
+				instance.mark(data.regions, {
+						"className": "markRegions",
+						"separateWordSearch": false,
+						"accuracy": "complementary",
+						"caseSensitive": true,
+				});
+				instance.mark(data.development_terms, {
+						"className": "markDterms",
+						"separateWordSearch": false,
+						"accuracy": "complementary",
+						"caseSensitive": true,
+				});
+			},
+			error: function (jqXhr, textStatus, errorMessage) {
+				alert("Issue while working with markjs");
+			}
+		});
 
 		// highligh search terms
 		var query = $(".form-row input[name='tak']").val();
@@ -75,5 +107,6 @@ $(function() {
 				"accuracy": "complementary",
 		});
 	}
+	*/
 
 });
