@@ -44,6 +44,19 @@ function AbstractReadMore() {
 	});
 
 	$(document).on("click", ".readMore,.readLess", function() {
-		$(this).closest(".addReadMore").toggleClass("showlesscontent showmorecontent");
+		var currentElement = $(this).closest(".addReadMore");
+		$(currentElement).toggleClass("showlesscontent showmorecontent");
+
+		var classAction = $(this).attr("class");
+		if (classAction == "readMore") {
+			$(".SecSec", currentElement).show();
+			$(".readMore", currentElement).hide();
+			$(".readLess", currentElement).show();
+		}
+		else {
+			$(".SecSec", currentElement).hide();
+			$(".readMore", currentElement).show();
+			$(".readLess", currentElement).hide();
+		}
 	});
 }
