@@ -119,7 +119,7 @@
                 <td class="col-2"> {{ publication.authors|check_availablity }} </td>
                 <td class="col-1"> {{ publication.year }} </td>
                 <td class="col-2 highlighter">
-                  <a href="{% url 'showrecord'%}?auth={{ auth }}&importedfrom={{ publication.get_persisted_id | urlencode }}" target="_blank">
+                  <a href="{% url 'showrecord'%}?auth={{ auth }}&id={{ publication.id }}" target="_blank">
                     {{ publication.title|check_availablity|replace_highlighted }}
                   </a>
                 </td>

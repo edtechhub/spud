@@ -1,3 +1,6 @@
+{% load publications_extras %}
+{% load highlighter %}
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -57,19 +60,19 @@
             </tr>
             <tr class="d-flex">
               <th class="col-2"> Title </th>
-              <td class="col-10 text-justify"> {{ publication.title }} </td>
+              <td class="col-10 text-justify"> {{ publication.title|check_availablity|replace_highlighted }} </td>
             </tr>
             <tr class="d-flex">
               <th class="col-2"> Authors </th>
-              <td class="col-10 text-justify"> {{ publication.authors }} </td>
+              <td class="col-10 text-justify"> {{ publication.authors|check_availablity }} </td>
             </tr>
             <tr class="d-flex">
               <th class="col-2"> Abstract </th>
-              <td class="col-10 text-justify"> {{ publication.abstract }} </td>
+              <td class="col-10 text-justify"> {{ publication.abstract|check_availablity|replace_highlighted }} </td>
             </tr>
             <tr class="d-flex">
               <th class="col-2"> Keywords </th>
-              <td class="col-10 text-justify"> {{ publication.keywords }} </td>
+              <td class="col-10 text-justify"> {{ publication.keywords|check_availablity|replace_highlighted }} </td>
             </tr>
             <tr class="d-flex">
               <th class="col-2"> Identifier </th>
