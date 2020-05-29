@@ -46,9 +46,11 @@ class Publication(models.Model):
 	def ris_format(self):
 		publication = self
 
+		authors_list = publication.authors.replace("[author]", "").strip().strip(";").split(";")
+
 		bibliographical_data = ["TY  - JOUR"]
 		bibliographical_data.append("TI  - {0}".format(publication.title))
-		[bibliographical_data.append("AU  - {0}".format(_a.strip())) for _a in publication.authors.split(";")]
+		[bibliographical_data.append("AU  - {0}".format(_a.strip())) for _a in authors_list]
 		bibliographical_data.append("T2  - {0}".format(publication.containername))
 
 		if publication.author100 and publication.author100 != "None":

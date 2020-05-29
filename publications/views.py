@@ -97,11 +97,27 @@ def ris_export(request):
 	if auth != settings.AUTH_KEY:
 		return HttpResponse('401 Unauthorized', status=401)
 
-	importedfrom = request.POST.get('importedfrom')
-	publication = Publication.objects.filter(importedfrom__endswith=importedfrom).first()
+	publication_id = request.POST.get('id')
+	publication = Publication.objects.filter(id=publication_id).first()
 
 	response = HttpResponse(publication.ris_format(), content_type="text/plain")
 	response['Content-Disposition'] = 'attachment; filename="{0}{1}.ris"'.format(publication.id, publication.year)
+
+	return response
+
+@require_http_methods(["POST"])
+def zotero_export(request):
+	auth = request.POST.get('auth', '');
+	if auth != settings.AUTH_KEY:
+		return HttpResponse('401 Unauthorized', status=401)
+
+	publication_ids = request.POST.getlist('ids[]')
+	publications = Publication.objects.filter(id__in=publication_ids)
+
+	zotero_content = "\n\n".join([publication.ris_format() for publication in publications])
+
+	response = HttpResponse(zotero_content, content_type="application/x-research-info-systems")
+	response['Content-Disposition'] = 'attachment; filename="zotero.ris"'
 
 	return response
 

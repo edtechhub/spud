@@ -15,8 +15,8 @@ function AbstractReadMore() {
 
 		wordsLmt = parseInt($(this).attr("wordsLmt"));
 
-		var allstr = $(this).html();
-		carLmt = nthIndex(allstr, " ", wordsLmt)
+		var allstr = $. trim($(this).html());
+		carLmt = nthIndex(allstr, " ", wordsLmt);
 		var updatedCarLmt = carLmt + 5;
 
 		if (carLmt > 0) {

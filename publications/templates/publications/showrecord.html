@@ -37,7 +37,7 @@
           <form action="{% url 'ris_export' %}" method="POST">
             {% csrf_token %}
             <input name="auth" type="hidden" value="{{ auth }}">
-            <input name="importedfrom" type="hidden" value="{{ publication.get_persisted_id }}">
+            <input name="id" type="hidden" value="{{ publication.id }}">
 
             <button class="btn btn-secondary"> Export as RIS </button>
           </form>
