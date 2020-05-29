@@ -40,11 +40,11 @@
         <input name="auth" type="hidden" value="{{ auth }}">
         <div class="form-row">
 
-          <div class="col-md-2">
+          <div class="col-md-1">
             <input type="number" step="1" class="form-control" name="year" value="{{ year }}" placeholder="year">
           </div>
 
-          <div class="col-md-7">
+          <div class="col-md-6">
             <input type="text" class="form-control" name="tak" value="{{ tak }}" placeholder="query">
           </div>
 
@@ -59,6 +59,13 @@
                 {% endif %}
               {% endfor %}
             </select>
+          </div>
+
+          <div class="col-md-2 pl-5 pt-1">
+            <input class="form-check-input" type="checkbox" id="highlight-checkbox" name="highlight" {% if highlight_keywords %} checked {% endif %}>
+            <label class="form-check-label" for="highlight-checkbox">
+              Highlight Terms
+            </label>
           </div>
 
           <div class="col-md-1">
@@ -120,14 +127,26 @@
                 <td class="col-1"> {{ publication.year }} </td>
                 <td class="col-2 highlighter">
                   <a href="{% url 'showrecord'%}?auth={{ auth }}&id={{ publication.id }}" target="_blank">
-                    {{ publication.title|check_availablity|replace_highlighted }}
+                    {% if highlight_keywords %}
+                      {{ publication.title|check_availablity|replace_highlighted }}
+                    {% else %}
+                      {{ publication.title|check_availablity }}
+                    {% endif %}
                   </a>
                 </td>
                 <td class="col-4 highlighter addReadMore showlesscontent">
-                  {{ publication.abstract|check_availablity|replace_highlighted }}
+                  {% if highlight_keywords %}
+                    {{ publication.abstract|check_availablity|replace_highlighted }}
+                  {% else %}
+                    {{ publication.abstract|check_availablity }}
+                  {% endif %}
                 </td>
                 <td class="col-2 highlighter wrap">
-                  {{ publication.keywords|check_availablity|replace_highlighted }}
+                  {% if highlight_keywords %}
+                    {{ publication.keywords|check_availablity|replace_highlighted }}
+                  {% else %}
+                    {{ publication.keywords|check_availablity }}
+                  {% endif %}
                 </td>
                 <td class="col-1 wrap">
                   {% if publication.doi %}
