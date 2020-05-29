@@ -75,9 +75,8 @@ def showrecord(request):
 	if auth != settings.AUTH_KEY:
 		return HttpResponse('401 Unauthorized', status=401)
 
-	importedfrom = request.GET.get('importedfrom')
-
-	publication = Publication.objects.filter(importedfrom__endswith=importedfrom).first()
+	publication_id = request.GET.get('id')
+	publication = Publication.objects.filter(id=publication_id).first()
 
 	context = {
 		'publication': publication,
