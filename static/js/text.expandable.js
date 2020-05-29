@@ -1,6 +1,6 @@
 function AbstractReadMore() {
 	//This limit you can set after how much characters you want to show Read More.
-	var carLmt = 300;
+	var carLmt = 280;
 	//wordsLmt
 	var wordsLmt = 70;
 	// Text to show when text is collapsed
@@ -12,6 +12,8 @@ function AbstractReadMore() {
 	$(".addReadMore").each(function() {
 		if ($(this).find(".firstSec").length)
 			return;
+
+		wordsLmt = parseInt($(this).attr("wordsLmt"));
 
 		var allstr = $(this).html();
 		carLmt = nthIndex(allstr, " ", wordsLmt)

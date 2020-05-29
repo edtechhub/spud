@@ -19,6 +19,9 @@ def index(request):
 	tak = request.GET.get('tak', '').strip()
 	with_filter = request.GET.get('with', '')
 
+	highlight_keywords = request.GET.get('highlight', 'off')
+	highlight_keywords = True if highlight_keywords == "on" else False
+
 	# if none of the paramter is given then move it to Zimbabwe
 	if not (year or tak or with_filter):
 		return redirect("/?with={1}&auth={0}".format(auth, "Zimbabwe"))
@@ -62,9 +65,11 @@ def index(request):
 		'with_filter': with_filter,
 		'WITH_FILTERS': settings.WITH_FILTERS.keys(),
 
+		'ABSTRACT_WORDS_LIMIT': settings.ABSTRACT_WORDS_LIMIT,
+		'highlight_keywords': highlight_keywords,
+
 		'auth': settings.AUTH_KEY,
 		'q__q': q__q,
-
 	}
 
 	return render(request, 'publications/index.html', context)
