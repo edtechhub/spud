@@ -65,6 +65,7 @@ def index(request):
 		'with_filter': with_filter,
 		'WITH_FILTERS': settings.WITH_FILTERS.keys(),
 
+		'ABSTRACT_WORDS_LIMIT': settings.ABSTRACT_WORDS_LIMIT,
 		'highlight_keywords': highlight_keywords,
 
 		'auth': settings.AUTH_KEY,

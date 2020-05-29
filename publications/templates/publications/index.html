@@ -134,7 +134,7 @@
                     {% endif %}
                   </a>
                 </td>
-                <td class="col-4 highlighter addReadMore showlesscontent">
+                <td class="col-4 highlighter addReadMore showlesscontent" wordsLmt="{{ ABSTRACT_WORDS_LIMIT }}">
                   {% if highlight_keywords %}
                     {{ publication.abstract|check_availablity|replace_highlighted }}
                   {% else %}
