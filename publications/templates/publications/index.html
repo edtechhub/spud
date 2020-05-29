@@ -75,9 +75,9 @@
         </div>
       </form>
 
-      <div class="row mb-2">
+      <div class="row">
 
-        <div class="col-md-6">
+        <div class="col-md-6 pt-2">
           <p class="b">
             Matching records:
             <span class="font-weight-bold"> {{ total_matched_records|intcomma }} </span>
@@ -99,8 +99,20 @@
           </div>
         </div>
 
-        <div class="col-md-2 offset-md-3 text-left">
-          <input id="abstract-toggle-btn" type="checkbox" checked data-toggle="toggle" data-on="Abridged Abstracts" data-off="Full Abstracts" data-onstyle="success" data-offstyle="danger" data-width="210" data-height="40">
+        <div class="col-md-2 offset-md-2 text-left">
+          <input id="abstract-toggle-btn" type="checkbox" checked data-toggle="toggle" data-on="Abridged Abstracts" data-off="Full Abstracts" data-onstyle="success" data-offstyle="danger" data-width="210" data-height="39">
+        </div>
+
+        <div class="col-md-2 text-left">
+          <form action="{% url 'zotero_export' %}" method="POST">
+            {% csrf_token %}
+            <input name="auth" type="hidden" value="{{ auth }}">
+            {% for publication in publications %}
+              <input name="ids[]" type="hidden" value="{{ publication.id }}">
+            {% endfor %}
+
+            <button class="btn btn-secondary"> Zotero Export </button>
+          </form>
         </div>
 
       </div>

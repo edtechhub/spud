@@ -9,11 +9,20 @@ from django.views.decorators.http import require_http_methods
 from django.conf import settings
 from utils import *
 
+
+def authenticate_user(function):
+	def wrapper(request, *args, **kwargs):
+		auth = request.GET.get('auth', request.POST.get('auth', '')).strip()
+		if (not auth) or (auth != settings.AUTH_KEY):
+			return HttpResponse('401 Unauthorized', status=401)
+		return function(request, *args, **kwargs)
+
+	return wrapper
+
 @require_http_methods(["GET"])
+@authenticate_user
 def index(request):
 	auth = request.GET.get('auth', '')
-	if auth != settings.AUTH_KEY:
-		return HttpResponse('401 Unauthorized', status=401)
 
 	year = request.GET.get('year', '').strip()
 	tak = request.GET.get('tak', '').strip()
@@ -75,10 +84,9 @@ def index(request):
 	return render(request, 'publications/index.html', context)
 
 @require_http_methods(["GET"])
+@authenticate_user
 def showrecord(request):
 	auth = request.GET.get('auth', '')
-	if auth != settings.AUTH_KEY:
-		return HttpResponse('401 Unauthorized', status=401)
 
 	publication_id = request.GET.get('id')
 	publication = Publication.objects.filter(id=publication_id).first()
@@ -92,23 +100,36 @@ def showrecord(request):
 	return render(request, 'publications/showrecord.html', context)
 
 @require_http_methods(["POST"])
+@authenticate_user
 def ris_export(request):
 	auth = request.POST.get('auth', '');
-	if auth != settings.AUTH_KEY:
-		return HttpResponse('401 Unauthorized', status=401)
 
-	importedfrom = request.POST.get('importedfrom')
-	publication = Publication.objects.filter(importedfrom__endswith=importedfrom).first()
+	publication_id = request.POST.get('id')
+	publication = Publication.objects.filter(id=publication_id).first()
 
 	response = HttpResponse(publication.ris_format(), content_type="text/plain")
 	response['Content-Disposition'] = 'attachment; filename="{0}{1}.ris"'.format(publication.id, publication.year)
 
 	return response
 
+@require_http_methods(["POST"])
+@authenticate_user
+def zotero_export(request):
+	auth = request.POST.get('auth', '');
+
+	publication_ids = request.POST.getlist('ids[]')
+	publications = Publication.objects.filter(id__in=publication_ids)
+
+	zotero_content = "\n\n".join([publication.ris_format() for publication in publications])
+
+	response = HttpResponse(zotero_content, content_type="application/x-research-info-systems")
+	response['Content-Disposition'] = 'attachment; filename="zotero.ris"'
+
+	return response
+
 @require_http_methods(["GET"])
+@authenticate_user
 def keywords(request):
 	auth = request.GET.get('auth', '');
-	if auth != settings.AUTH_KEY:
-		return HttpResponse('401 Unauthorized', status=401)
 
 	return JsonResponse({'countries': settings.COUNTRIES, 'regions': settings.REGIONS, 'development_terms': settings.DEVELOPMENT_TERMS})
