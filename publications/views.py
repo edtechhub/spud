@@ -28,8 +28,8 @@ def index(request):
 	tak = request.GET.get('tak', '').strip()
 	with_filter = request.GET.get('with', '')
 
-	highlight_keywords = request.GET.get('highlight', 'off')
-	highlight_keywords = True if highlight_keywords == "on" else False
+	highlight_param = request.GET.get('highlight', 'on')
+	highlight_keywords = True if highlight_param == "on" else False
 
 	# if none of the paramter is given then move it to Zimbabwe
 	if not (year or tak or with_filter):
@@ -75,6 +75,7 @@ def index(request):
 		'WITH_FILTERS': settings.WITH_FILTERS.keys(),
 
 		'ABSTRACT_WORDS_LIMIT': settings.ABSTRACT_WORDS_LIMIT,
+		'highlight_param': highlight_param,
 		'highlight_keywords': highlight_keywords,
 
 		'auth': settings.AUTH_KEY,
@@ -91,8 +92,12 @@ def showrecord(request):
 	publication_id = request.GET.get('id')
 	publication = Publication.objects.filter(id=publication_id).first()
 
+	highlight_param = request.GET.get('highlight', 'on')
+	highlight_keywords = True if highlight_param == "on" else False
+
 	context = {
 		'publication': publication,
+		'highlight_keywords': highlight_keywords,
 
 		'auth': settings.AUTH_KEY,
 	}
@@ -107,7 +112,7 @@ def ris_export(request):
 	publication_id = request.POST.get('id')
 	publication = Publication.objects.filter(id=publication_id).first()
 
-	response = HttpResponse(publication.ris_format(), content_type="text/plain")
+	response = HttpResponse(publication.ris_format(), content_type="application/x-research-info-systems")
 	response['Content-Disposition'] = 'attachment; filename="{0}{1}.ris"'.format(publication.id, publication.year)
 
 	return response
