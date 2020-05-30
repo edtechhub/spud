@@ -112,7 +112,7 @@ def ris_export(request):
 	publication_id = request.POST.get('id')
 	publication = Publication.objects.filter(id=publication_id).first()
 
-	response = HttpResponse(publication.ris_format(), content_type="text/plain")
+	response = HttpResponse(publication.ris_format(), content_type="application/x-research-info-systems")
 	response['Content-Disposition'] = 'attachment; filename="{0}{1}.ris"'.format(publication.id, publication.year)
 
 	return response
