@@ -60,7 +60,13 @@
             </tr>
             <tr class="d-flex">
               <th class="col-2"> Title </th>
-              <td class="col-10 text-justify"> {{ publication.title|check_availablity|replace_highlighted }} </td>
+              <td class="col-10 text-justify">
+                {% if highlight_keywords %}
+                  {{ publication.title|check_availablity|replace_highlighted }}
+                {% else %}
+                  {{ publication.title|check_availablity }}
+                {% endif %}
+              </td>
             </tr>
             <tr class="d-flex">
               <th class="col-2"> Authors </th>
@@ -68,11 +74,23 @@
             </tr>
             <tr class="d-flex">
               <th class="col-2"> Abstract </th>
-              <td class="col-10 text-justify"> {{ publication.abstract|check_availablity|replace_highlighted }} </td>
+              <td class="col-10 text-justify">
+                {% if highlight_keywords %}
+                  {{ publication.abstract|check_availablity|replace_highlighted }}
+                {% else %}
+                  {{ publication.abstract|check_availablity }}
+                {% endif %}
+              </td>
             </tr>
             <tr class="d-flex">
               <th class="col-2"> Keywords </th>
-              <td class="col-10 text-justify"> {{ publication.keywords|check_availablity|replace_highlighted }} </td>
+              <td class="col-10 text-justify">
+                  {% if highlight_keywords %}
+                    {{ publication.keywords|check_availablity|replace_highlighted }}
+                  {% else %}
+                    {{ publication.keywords|check_availablity }}
+                  {% endif %}
+              </td>
             </tr>
             <tr class="d-flex">
               <th class="col-2"> Identifier </th>
