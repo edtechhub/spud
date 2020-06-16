@@ -28,7 +28,7 @@ def index(request):
 	tak = request.GET.get('tak', '').strip()
 	with_filter = request.GET.get('with', '')
 
-	highlight_param = request.GET.get('highlight', 'on')
+	highlight_param = request.GET.get('highlight', 'off')
 	highlight_keywords = True if highlight_param == "on" else False
 
 	# if none of the paramter is given then move it to Zimbabwe
