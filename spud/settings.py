@@ -254,7 +254,7 @@ RESEARCH = ["DBIR", "DBR", "EBR", "Multimethod", "Multiple research approach", "
 KEYWORDS = {
     "Countries": COUNTRIES,
     # "Regions": REGIONS,
-    # "Dterms": DEVELOPMENT_TERMS,
+    # "DevelopmentTerms": DEVELOPMENT_TERMS,
     # "TechTerms": TECH_TERMS,
     # "EducationalTerms": EDUCATIONAL_TERMS,
     # "Population1": POPULATION1,
