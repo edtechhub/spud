@@ -253,15 +253,15 @@ RESEARCH = ["DBIR", "DBR", "EBR", "Multimethod", "Multiple research approach", "
 
 KEYWORDS = {
     "Countries": COUNTRIES,
-    "Regions": REGIONS,
-    "DevelopmentTerms": DEVELOPMENT_TERMS,
-    "TechTerms": TECH_TERMS,
-    "EducationalTerms": EDUCATIONAL_TERMS,
-    "Population1": POPULATION1,
-    "Population2": POPULATION2,
-    "Organizations": ORGANISATIONS,
-    "Focus": FOCUS,
-    "Research": RESEARCH,
+    # "Regions": REGIONS,
+    # "DevelopmentTerms": DEVELOPMENT_TERMS,
+    # "TechTerms": TECH_TERMS,
+    # "EducationalTerms": EDUCATIONAL_TERMS,
+    # "Population1": POPULATION1,
+    # "Population2": POPULATION2,
+    # "Organizations": ORGANISATIONS,
+    # "Focus": FOCUS,
+    # "Research": RESEARCH,
 }
 
 AUTH_KEY = env("AUTH_KEY")
