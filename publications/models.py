@@ -1,8 +1,5 @@
 from django.db import models
 
-from django.contrib.postgres.search import SearchVectorField
-from django.contrib.postgres.indexes import GinIndex
-
 class Publication(models.Model):
 	class Meta:
 		db_table = 'publications'
@@ -18,8 +15,6 @@ class Publication(models.Model):
 	importedfrom = models.TextField()
 	containername = models.TextField()
 	doi = models.TextField()
-
-	tsv = SearchVectorField(null=True)
 
 	recordmetadata_zbuamajorversion = models.TextField()
 	recordmetadata_dateretrieved = models.TextField()
