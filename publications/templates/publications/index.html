@@ -43,7 +43,7 @@
             <input type="text" class="form-control" name="author" value="{{ author }}" placeholder="author">
           </div>
 
-          <div class="col-md-4">
+          <div class="col-md-1">
             <input type="number" step="1" class="form-control" name="year" value="{{ year }}" placeholder="year">
           </div>
 
@@ -200,7 +200,7 @@
           <input id="abstract-toggle-btn" type="checkbox" checked data-toggle="toggle" data-on="Abridged Abstracts" data-off="Full Abstracts" data-onstyle="success" data-offstyle="danger" data-width="210" data-height="39">
         </div>
 
-        <div class="col-md-2 text-left">
+        <div class="col-md-2">
           <form action="{% url 'zotero_export' %}" method="POST">
             {% csrf_token %}
             <input name="auth" type="hidden" value="{{ auth }}">
@@ -208,12 +208,22 @@
               <input name="ids[]" type="hidden" value="{{ publication.id }}">
             {% endfor %}
 
-            <button class="btn btn-secondary"> RIS Export </button>
+            <button class="btn btn-secondary btn-block"> RIS Export </button>
           </form>
         </div>
 
       </div>
 
+	  {% if highlight_keywords %}
+        <div class="row mt-1">
+            <ul class="legend col-md-12">
+              {% for key, values in KEYWORDS_LIST %}
+                <li> <span class="mark{{ key }}"></span> {{ key }} </li>
+              {% endfor %}
+            </ul>
+        </div>
+      {% endif %}
+	  
       <div class="row mt-6">
         <div class="col-md-12">
 
