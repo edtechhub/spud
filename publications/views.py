@@ -26,27 +26,27 @@ def index(request):
 
 	year = request.GET.get('year', '').strip()
 	tak = request.GET.get('tak', '').strip()
-	with_filter = request.GET.get('with', '')
+	author = request.GET.get('author', '').strip()
+	filters = request.GET.getlist('countries')
 
-	highlight_param = request.GET.get('highlight', 'off')
+	search_engine = request.GET.get('search-engine', 'off')
+	highlight_param = request.GET.get('highlight', 'on')
 	highlight_keywords = True if highlight_param == "on" else False
 
-	# if none of the paramter is given then move it to Zimbabwe
-	if not (year or tak or with_filter):
-		return redirect("/?with={1}&auth={0}".format(auth, "Zimbabwe"))
 
-	q_year = q_tak = q_with = Q()
-	if with_filter == "None": with_filter = ''
 
-	if year: q_year = Q(year=year)
+	if search_engine == 'off':
+		publications_list = Publication.objects.raw(raw_query(author, filters, year, tak))
+	else:
+		q_year = q_tak = q_with = Q()
+		if year: q_year = Q(year=year)
 
-	if tak: q_tak = formulate_tak_query(tak)
+		if tak: q_tak = formulate_tak_query(tak)
 
-	if with_filter: q_with = formulate_with_filter_query(with_filter)
+		publications_list = Publication.objects.filter(q_year & (q_tak)).order_by('-year')
 
-	total_records = Publication.objects.count()
 
-	publications_list = Publication.objects.filter(q_year & (q_tak) & (q_with)).order_by('-year')
+	total_records = faster_count()
 
 	per_page = request.GET.get('limit', 50)
 	if int(per_page) == 0:
@@ -69,19 +69,26 @@ def index(request):
 		'total_matched_records': total_matched_records,
 		'year': year,
 		'tak': tak,
+		'author': author,
 		'limit': per_page,
 
-		'with_filter': with_filter,
-		'WITH_FILTERS': settings.WITH_FILTERS.keys(),
-
 		'ABSTRACT_WORDS_LIMIT': settings.ABSTRACT_WORDS_LIMIT,
-
 		'highlight_param': highlight_param,
 		'highlight_keywords': highlight_keywords,
-		'KEYWORDS_LIST': settings.KEYWORDS.items(),
+		'form_f': settings.FORM_F,
+		'form_gc': settings.FORM_GC,
+		'form_gd': settings.FORM_GD,
+		'form_gr': settings.FORM_GR,
+		'form_o': settings.FORM_O,
+		'form_p1': settings.FORM_P1,
+		'form_p2': settings.FORM_P2,
+		'form_r': settings.FORM_R,
+		'form_te': settings.FORM_TE,
+		'form_tt': settings.FORM_TT,
 
 		'auth': settings.AUTH_KEY,
 		'q__q': q__q,
+
 	}
 
 	return render(request, 'publications/index.html', context)
