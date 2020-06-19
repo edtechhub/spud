@@ -12,7 +12,7 @@
     <meta name="author" content="">
 
     <title>
-      ETH SPuD - {{ tak }} - with {{ with_filter }}; page {{ publications.number }}
+      ETH SPuD - {{ tak }} ; page {{ publications.number }}
 
       {% if year %}
         ; {{ year }}
@@ -39,8 +39,11 @@
         <input name="limit" type="hidden" value="{{ limit }}">
         <input name="auth" type="hidden" value="{{ auth }}">
         <div class="form-row">
+          <div class="col-md-3">
+            <input type="text" class="form-control" name="author" value="{{ author }}" placeholder="author">
+          </div>
 
-          <div class="col-md-1">
+          <div class="col-md-4">
             <input type="number" step="1" class="form-control" name="year" value="{{ year }}" placeholder="year">
           </div>
 
@@ -48,34 +51,112 @@
             <input type="text" class="form-control" name="tak" value="{{ tak }}" placeholder="query">
           </div>
 
-          <div class="col-md-2">
-            <select class="form-control" name="with">
-              <option value="None"> None </option>
-              {% for k in WITH_FILTERS %}
-                {% if with_filter|lower == k|lower %}
-                  <option value="{{ k }}" selected="selected"> {{ k }} </option>
-                {% else %}
-                  <option value="{{ k }}"> {{ k }} </option>
-                {% endif %}
-              {% endfor %}
-            </select>
-          </div>
-
-          <div class="col-md-2 pl-5 pt-1">
-            <input class="form-check-input" type="checkbox" id="highlight-checkbox" name="highlight" {% if highlight_keywords %} checked {% endif %}>
-            <label class="form-check-label" for="highlight-checkbox">
-              Highlight Terms
-            </label>
-          </div>
-
-          <div class="col-md-1">
-            <button type="submit" class="btn btn-primary btn-block"> Filter </button>
+          <div class="col-md-4">
+            <button type="submit" class="btn btn-primary"> Filter </button>
           </div>
 
         </div>
       </form>
 
       <div class="row">
+
+        <div class="col-md-4">
+            <select id="filters" name="F filter" multiple>
+              {% for key, value in form_f.items %}
+                <option value="{{ key }}">{{ value }}</option>
+              {% endfor %}
+            </select> 
+          </div>
+
+          <div class="col-md-4">
+            <select id="filters" name="GC filter" multiple>
+              {% for key, value in form_gc.items %}
+                <option value="{{ key }}">{{ value }}</option>
+              {% endfor %}
+            </select> 
+          </div>
+
+          <div class="col-md-4">
+            <select id="filters" name="GD filter" multiple>
+              {% for key, value in form_gd.items %}
+                <option value="{{ key }}">{{ value }}</option>
+              {% endfor %}
+            </select> 
+          </div>
+
+        </div>
+        <div class="row">
+
+          <div class="col-md-4">
+            <select id="filters" name="GR filter" multiple>
+              {% for key, value in form_gr.items %}
+                <option value="{{ key }}">{{ value }}</option>
+              {% endfor %}
+            </select> 
+          </div>
+
+          <div class="col-md-4">
+            <select id="filters" name="O filter" multiple>
+              {% for key, value in form_o.items %}
+                <option value="{{ key }}">{{ value }}</option>
+              {% endfor %}
+            </select> 
+          </div>
+
+          <div class="col-md-4">
+            <select id="filters" name="P1 filter" multiple>
+              {% for key, value in form_p1.items %}
+                <option value="{{ key }}">{{ value }}</option>
+              {% endfor %}
+            </select> 
+          </div>
+
+        </div>
+        <div class="row">    
+
+          <div class="col-md-4">
+            <select id="filters" name="P2 filter" multiple>
+              {% for key, value in form_p2.items %}
+                <option value="{{ key }}">{{ value }}</option>
+              {% endfor %}
+            </select> 
+          </div>
+
+          <div class="col-md-4">
+            <select id="filters" name="F filter" multiple>
+              {% for key, value in form_f.items %}
+                <option value="{{ key }}">{{ value }}</option>
+              {% endfor %}
+            </select> 
+          </div>
+
+          <div class="col-md-4">
+            <select id="filters" name="R filter" multiple>
+              {% for key, value in form_r.items %}
+                <option value="{{ key }}">{{ value }}</option>
+              {% endfor %}
+            </select> 
+          </div>
+
+        </div>
+        <div class="row">
+
+          <div class="col-md-4">
+            <select id="filters" name="TE filter" multiple>
+              {% for key, value in form_te.items %}
+                <option value="{{ key }}">{{ value }}</option>
+              {% endfor %}
+            </select> 
+          </div>
+
+          <div class="col-md-4">
+            <select id="filters" name="TT filter" multiple>
+              {% for key, value in form_tt.items %}
+                <option value="{{ key }}">{{ value }}</option>
+              {% endfor %}
+            </select> 
+          </div>
+      </div>
 
         <div class="col-md-6 pt-2">
           <p class="b">
@@ -84,6 +165,22 @@
             (out of {{ total_records|intcomma }} records)
           </p>
         </div>
+
+          <div class="col-md-2 pl-5 pt-1">
+            <input type='hidden' value='off' name='highlight'>
+            <input class="form-check-input" type="checkbox" id="highlight-checkbox" name="highlight" checked>
+            <label class="form-check-label" for="highlight-checkbox">
+              Highlight Terms
+            </label>
+          </div>
+
+          <div class="col-md-2 pl-5 pt-1">
+            <input type='hidden' value='off' name='search-engine'>
+            <input class="form-check-input" type="checkbox" id="old-search-engine" name="search-engine">
+            <label class="form-check-label" for="old-search-engine">
+              Old search engine
+            </label>
+          </div>
 
         <div class="col-md-2 text-right offset-md-2 d-none">
           <button type="button" class="btn btn-warning text-white" id="btn-mark-now" data-toggle="tooltip" data-placement="top" title="Click to highlight key words and search terms. Note that this will momentarily slow down this page.">
@@ -103,7 +200,7 @@
           <input id="abstract-toggle-btn" type="checkbox" checked data-toggle="toggle" data-on="Abridged Abstracts" data-off="Full Abstracts" data-onstyle="success" data-offstyle="danger" data-width="210" data-height="39">
         </div>
 
-        <div class="col-md-2">
+        <div class="col-md-2 text-left">
           <form action="{% url 'zotero_export' %}" method="POST">
             {% csrf_token %}
             <input name="auth" type="hidden" value="{{ auth }}">
@@ -111,21 +208,11 @@
               <input name="ids[]" type="hidden" value="{{ publication.id }}">
             {% endfor %}
 
-            <button class="btn btn-secondary btn-block"> RIS Export </button>
+            <button class="btn btn-secondary"> RIS Export </button>
           </form>
         </div>
 
       </div>
-
-      {% if highlight_keywords %}
-        <div class="row mt-1">
-            <ul class="legend col-md-12">
-              {% for key, values in KEYWORDS_LIST %}
-                <li> <span class="mark{{ key }}"></span> {{ key }} </li>
-              {% endfor %}
-            </ul>
-        </div>
-      {% endif %}
 
       <div class="row mt-6">
         <div class="col-md-12">

@@ -17,7 +17,7 @@ body {
 	color: white;
 }
 
-.markDevelopmentTerms {
+.markDterms {
 	background: blue;
 	color: white;
 }
@@ -77,7 +77,3 @@ body {
 .form-check-label {
 	cursor: pointer;
 }
-
-.legend { list-style: none; }
-.legend li { float: left; margin-right: 10px; }
-.legend span { border: 1px solid #ccc; float: left; width: 20px; height: 20px; margin: 2px; }
