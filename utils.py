@@ -1,40 +1,8 @@
 from django.db.models import Q
-from django.conf import settings
+from django.db import connection
 
 import re
 
-
-def formulate_with_filter_query(key):
-	parts = settings.WITH_FILTERS[key]
-	if type(parts) == str and (" AND " in parts or " OR " in parts):
-		return join_with_filter_queries(key)
-
-	if type(parts) == str:
-		return Q(tak__iregex=parts)
-
-	q_with = Q()
-	for _q in parts["regex"]:
-		q_with |= Q(tak__regex=_q)
-
-	for _q in parts["iregex"]:
-		q_with |= Q(tak__iregex=_q)
-
-	return q_with
-
-def join_with_filter_queries(key):
-	query = settings.WITH_FILTERS[key]
-	keys = query.replace(" AND ", " ").replace(" OR ", " ").replace("(", "").replace(")", "").split()
-
-	complete_query = {}
-	for _key in keys:
-		complete_query[_key] = formulate_with_filter_query(_key)
-
-	if key == "TT and PP":
-		return ((complete_query["TT"]) & (complete_query["PP"]))
-	elif key == "TE or (TT and PP)":
-		return ((complete_query["TE"]) | (complete_query["TT"]) & (complete_query["PP"]))
-	else:
-		return Q()
 
 def formulate_tak_query(query_string):
 	query_parts = Q()
@@ -58,3 +26,12 @@ def formulate_tak_query(query_string):
 			query_parts &= Q(tak__iregex=_q)
 
 	return query_parts
+
+
+def faster_count():
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT reltuples::bigint AS __count FROM pg_class WHERE relname = 'publications';")
+        est_count = int(cursor.fetchone()[0])
+
+    return est_count
+

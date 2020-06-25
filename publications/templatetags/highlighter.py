@@ -11,10 +11,5 @@ def replace_highlighted(text):
 	for (_key, _values) in settings.KEYWORDS.items():
 		keywords_set = set(_values)
 		for _value in keywords_set:
-
-			if _value.isupper():
-				text = re.sub(_value, "<span class='mark%s'>%s</span>" % (_key, _value), text)
-			else:
-				text = re.sub(_value, "<span class='mark%s'>%s</span>" % (_key, _value), text, flags=re.I)
-
+			text = text.replace(_value, "<span class='mark%s'>%s</span>" % (_key, _value))
 	return mark_safe(text)

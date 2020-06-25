@@ -8,6 +8,42 @@ from django.views.decorators.http import require_http_methods
 
 from django.conf import settings
 from utils import *
+import time
+
+def raw_query(author, year, tak, filters = None):
+	query = """SELECT publications.id, publications.title, publications.additionaltitles, publications.authors, publications.year, publications.publicationtype, publications.links, publications.importedfrom, publications.containername, publications.doi, publications.tsv, publications.recordmetadata_zbuamajorversion, publications.recordmetadata_dateretrieved, publications.recordmetadata_dateconverted, publications.recordmetadata_recordtype, publications.recordmetadata_source, publications.recordmetadata_recordname, publications.recordmetadata_searchguid, publications.recordmetadata_numberinsource, publications.recordmetadata_zbuaminorversion, publications.publisherdatecopyright, publications.location, publications.author100, publications.daterange, publications.isbn, publications.citation, publications.keywords, publications.abstract, publications.identifier, publications.itemdatatype, publications.itemdatahandler, publications.created_at FROM publications WHERE """
+	counter = 0
+	if author:
+		counter += 1
+		query = query + """publications.tsa @@ websearch_to_tsquery('""" + str(author) + """')"""
+
+	if filters:
+		counter += 1
+		if counter == 1:
+			query = query + """publications.""" + str(filters[0]) + """ >'0'"""
+			for _filter in filters:
+				query = query + """ OR """ + """publications.""" + str(_filter) + """ >'0'"""
+		else:
+			for _filter in filters:
+				query = query + """ OR """ + """publications.""" + str(_filter) + """ >'0'"""
+	if year:
+		counter += 1
+		if counter == 1:
+			query = query + """publications.year='""" + str(year) + """'"""
+		else:
+			query = query + """ AND """ + """publications.year ='""" + str(year) + """'"""
+	if tak:
+		counter += 1
+		if counter == 1:
+			query = query + """publications.tsv @@ websearch_to_tsquery('""" + str(tak) + """')"""
+		else:
+			query = query + """ AND """ + """publications.tsv @@ websearch_to_tsquery('""" + str(tak) + """')"""
+
+	if counter == 0:
+		return Publication.objects.all()
+	query = query + """ ORDER BY year DESC"""
+
+	return Publication.objects.raw(query)
 
 
 def authenticate_user(function):
@@ -22,31 +58,44 @@ def authenticate_user(function):
 @require_http_methods(["GET"])
 @authenticate_user
 def index(request):
+	start = time.time()
+
 	auth = request.GET.get('auth', '')
 
 	year = request.GET.get('year', '').strip()
 	tak = request.GET.get('tak', '').strip()
-	with_filter = request.GET.get('with', '')
+	author = request.GET.get('author', '').strip()
+	form_f = request.GET.getlist('F filter')
+	form_gc = request.GET.getlist('GC filter')
+	form_gd = request.GET.getlist('GD filter')
+	form_gr = request.GET.getlist('GR filter')
+	form_o = request.GET.getlist('O filter')
+	form_p1 = request.GET.getlist('P1 filter')
+	form_p2 = request.GET.getlist('P2 filter')
+	form_r = request.GET.getlist('R filter')
+	form_te = request.GET.getlist('TE filter')
+	form_tt = request.GET.getlist('TT filter')
 
-	highlight_param = request.GET.get('highlight', 'off')
+	search_engine = request.GET.get('search-engine', 'off')
+	highlight_param = request.GET.get('highlight', 'on')
 	highlight_keywords = True if highlight_param == "on" else False
 
-	# if none of the paramter is given then move it to Zimbabwe
-	if not (year or tak or with_filter):
-		return redirect("/?with={1}&auth={0}".format(auth, "Zimbabwe"))
+	filters = []
+	#filters = form_f + form_gc + form_gd + form_gr + form_o + form_p1 + form_p2 + form_r + form_te + form_tt
 
-	q_year = q_tak = q_with = Q()
-	if with_filter == "None": with_filter = ''
 
-	if year: q_year = Q(year=year)
+	if search_engine == 'off':
+		publications_list = raw_query(author, year, tak, filters)
+	else:
+		q_year = q_tak = q_with = Q()
+		if year: q_year = Q(year=year)
 
-	if tak: q_tak = formulate_tak_query(tak)
+		if tak: q_tak = formulate_tak_query(tak)
 
-	if with_filter: q_with = formulate_with_filter_query(with_filter)
+		publications_list = Publication.objects.filter(q_year & (q_tak)).order_by('-year')
 
-	total_records = Publication.objects.count()
 
-	publications_list = Publication.objects.filter(q_year & (q_tak) & (q_with)).order_by('-year')
+	total_records = faster_count()
 
 	per_page = request.GET.get('limit', 50)
 	if int(per_page) == 0:
@@ -69,21 +118,41 @@ def index(request):
 		'total_matched_records': total_matched_records,
 		'year': year,
 		'tak': tak,
+		'author': author,
 		'limit': per_page,
 
-		'with_filter': with_filter,
-		'WITH_FILTERS': settings.WITH_FILTERS.keys(),
+		'form_f': form_f,
+		'FORM_F': settings.FORM_F,
+		'form_gc': form_gc,
+		'FORM_GC': settings.FORM_GC,
+		'form_gd': form_gd,
+		'FORM_GD': settings.FORM_GD,
+		'form_gr': form_gr,
+		'FORM_GR': settings.FORM_GR,
+		'form_o': form_o,
+		'FORM_O': settings.FORM_O,
+		'form_p1': form_p1,
+		'FORM_P1': settings.FORM_P1,
+		'form_p2': form_p2,
+		'FORM_P2': settings.FORM_P2,
+		'form_r': form_r,
+		'FORM_R': settings.FORM_R,
+		'form_te': form_te,
+		'FORM_TE': settings.FORM_TE,
+		'form_tt': form_tt,
+		'FORM_TT': settings.FORM_TT,
+
 
 		'ABSTRACT_WORDS_LIMIT': settings.ABSTRACT_WORDS_LIMIT,
-
 		'highlight_param': highlight_param,
 		'highlight_keywords': highlight_keywords,
-		'KEYWORDS_LIST': settings.KEYWORDS.items(),
+
 
 		'auth': settings.AUTH_KEY,
 		'q__q': q__q,
-	}
+		'timer': str(round(time.time() - start, 2)),
 
+	}
 	return render(request, 'publications/index.html', context)
 
 @require_http_methods(["GET"])
