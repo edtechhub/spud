@@ -17,7 +17,7 @@ body {
 	color: white;
 }
 
-.markDevelopmentTerms {
+.markDterms {
 	background: blue;
 	color: white;
 }
@@ -78,6 +78,22 @@ body {
 	cursor: pointer;
 }
 
-.legend { list-style: none; }
-.legend li { float: left; margin-right: 10px; }
-.legend span { border: 1px solid #ccc; float: left; width: 20px; height: 20px; margin: 2px; }
+* {
+  margin: 0;
+  padding: 0;
+}
+
+#loading {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(192, 192, 192, 0.5);
+  background-image: url("https://i.stack.imgur.com/MnyxU.gif");
+  background-repeat: no-repeat;
+  background-position: center;
+  visibility: hidden;
+}
