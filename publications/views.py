@@ -4,7 +4,6 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.db import connection
 from .models import Publication
-from .models import Gc
 from django.views.decorators.http import require_http_methods
 from django.contrib.postgres.search import SearchQuery
 
