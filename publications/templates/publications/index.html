@@ -7,12 +7,12 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
 
     <title>
-      ETH SPuD - {{ tak }} ; page {{ publications.number }}
+      ETH SPuD - {{ tak }} ; page {{ page_obj.number }}
 
       {% if year %}
         ; {{ year }}
@@ -43,6 +43,7 @@
     <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
       <a class="navbar-brand" href="/?limit=50&auth={{ auth }}">EdTechHub Searchable Publications Database</a>
     </nav>
+
     <div id="wrapper">
       <main role="main" class="container-fluid" style="margin-top: 50px;">
         <form action="{% url 'index' %}" method="GET" class="mb-3">
@@ -64,13 +65,13 @@
           </div>
 
         </div>
-
+        <hr class="form">
         <div class="row">    
-          <div class="col-md-6">
-            <label for="select-GC">Geo: Countries</label>
-            <select id="select-GC" class="filters" name="GC filter" placeholder="Geo: Countries" multiple>
-              {% for key, value in FORM_GC.items %}
-                {% if key in form_gc %}
+          <div class="col">
+            <label for="select-GC">Country / Regions</label>
+            <select id="select-GC" class="filters" name="country/regions" placeholder="Country / Regions" multiple>
+              {% for key, value in FORM_GC_GR.items %}
+                {% if key in form_gc_gr %}
                   <option value="{{ key }}" selected="selected">{{ value }}</option>
                 {% else %}
                   <option value="{{ key }}">{{ value }}</option>
@@ -78,58 +79,22 @@
               {% endfor %}
             </select> 
           </div>
-
-          <div class="col-md-6">
-            <label for="select-GR">Geo: Regions</label>
-            <select id="select-GR" class="filters" name="GR filter" placeholder="Geo: Regions" multiple>
-              {% for key, value in FORM_GR.items %}
-                {% if key in form_gr %}
-                  <option value="{{ key }}" selected="selected">{{ value }}</option>
-                {% else %}
-                  <option value="{{ key }}">{{ value }}</option>
-                {% endif %}
-              {% endfor %}
-            </select> 
+          <div class="col-md-2 text-left">
+            <label for="min-hdi">Min-HDI</label>
+            <input type="number" step="0.01" min="0" max="1" class="form-control" name="min_hdi" value="{{ min_hdi }}" placeholder="Min-HDI">
           </div>
-
-        </div>
-
-        <div class="row">
-
-          <div class="col-md-6">
-            <label for="select-GD">Geo: Development</label>
-            <select id="select-GD" class="filters" name="GD filter" placeholder="Geo: Development" multiple>
-              {% for key, value in FORM_GD.items %}
-                {% if key in form_gd %}
-                  <option value="{{ key }}" selected="selected">{{ value }}</option>
-                {% else %}
-                  <option value="{{ key }}">{{ value }}</option>
-                {% endif %}
-              {% endfor %}
-            </select> 
-          </div>
-
-          <div class="col-md-6">
-            <label for="select-TE">Technology: Education</label>
-            <select id="select-TE" class="filters" name="TE filter" placeholder="Technology: Education" multiple>
-              {% for key, value in FORM_TE.items %}
-                {% if key in form_te %}
-                  <option value="{{ key }}" selected="selected">{{ value }}</option>
-                {% else %}
-                  <option value="{{ key }}">{{ value }}</option>
-                {% endif %}
-              {% endfor %}
-            </select> 
+          <div class="col-md-2 text-left">
+            <label for="max-hdi">Max-HDI</label>
+            <input type="number" step="0.01" min="0" max="1" class="form-control" name="max_hdi" value="{{ max_hdi }}" placeholder="Max-HDI">
           </div>
         </div>
 
         <div class="row">
-
           <div class="col-md-6">
-            <label for="select-TT">Technology: Other</label>
-            <select id="select-TT" class="filters" name="TT filter" placeholder="Technology: Other" multiple>
-              {% for key, value in FORM_TT.items %}
-                {% if key in form_tt %}
+            <label for="select-TE-TT">Technology: Education / Other</label>
+            <select id="select-TE-TT" class="filters" name="TE/TT filter" placeholder="Technology: Education / Other" multiple>
+              {% for key, value in FORM_TE_TT.items %}
+                {% if key in form_te_tt %}
                   <option value="{{ key }}" selected="selected">{{ value }}</option>
                 {% else %}
                   <option value="{{ key }}">{{ value }}</option>
@@ -137,12 +102,11 @@
               {% endfor %}
             </select> 
           </div>
-
           <div class="col-md-6">
-            <label for="select-P1">Population: Education level</label>
-            <select id="select-P1" class="filters" name="P1 filter" placeholder="Population: Education level" multiple>
-              {% for key, value in FORM_P1.items %}
-                {% if key in form_p1 %}
+            <label for="select-P1-P2">Population: Education level and Context</label>
+            <select id="select-P1-P2" class="filters" name="P1/P2 filter" placeholder="Population: Education level and Context" multiple>
+              {% for key, value in FORM_P1_P2.items %}
+                {% if key in form_p1_p2 %}
                   <option value="{{ key }}" selected="selected">{{ value }}</option>
                 {% else %}
                   <option value="{{ key }}">{{ value }}</option>
@@ -150,39 +114,7 @@
               {% endfor %}
             </select> 
           </div>
-
         </div>
-
-        <div class="row">    
-
-          <div class="col-md-6">
-            <label for="select-P2">Population: Education context</label>
-            <select id="select-P2" class="filters" name="P2 filter" placeholder="Population: Education context" multiple>
-              {% for key, value in FORM_P2.items %}
-                {% if key in form_p2 %}
-                  <option value="{{ key }}" selected="selected">{{ value }}</option>
-                {% else %}
-                  <option value="{{ key }}">{{ value }}</option>
-                {% endif %}
-              {% endfor %}
-            </select> 
-          </div>
-
-          <div class="col-md-6">
-            <label for="select-O">Organisations</label>
-            <select id="select-O" class="filters" name="O filter" placeholder="Organisations" multiple>
-              {% for key, value in FORM_O.items %}
-                {% if key in form_o %}
-                  <option value="{{ key }}" selected="selected">{{ value }}</option>
-                {% else %}
-                  <option value="{{ key }}">{{ value }}</option>
-                {% endif %}
-              {% endfor %}
-            </select> 
-          </div>
-
-        </div>
-
         <div class="row">
 
           <div class="col-md-6">
@@ -211,38 +143,70 @@
             </select> 
           </div>
         </div>
-        <div class="row"> 
-
-            <div class="col-md-2 text-right offset-md-2 d-none">
-              <button type="button" class="btn btn-warning text-white" id="btn-mark-now" data-toggle="tooltip" data-placement="top" title="Click to highlight key words and search terms. Note that this will momentarily slow down this page.">
-                <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-                Mark Now
-              </button>
-            </div>
-
-            <div class="col-md-2 text-left d-none">
-              <div class="custom-control custom-checkbox mt-1" data-toggle="tooltip" data-placement="top" title="Click to highlight key words and search terms. Note that this will momentarily slow down this page." style="cursor: pointer;">
-                  <input type="checkbox" class="custom-control-input" id="chkbx-mark_always">
-                  <label class="custom-control-label" for="chkbx-mark_always"> Mark Always </label>
-              </div>
-            </div>          
-
-            <div class="col-md-2 pl-5 pt-1">
-              <input type='hidden' value='off' name='search-engine'>
-              <input class="form-check-input" type="checkbox" id="old-search-engine" name="search-engine">
-              <label class="form-check-label" for="old-search-engine">
-                Old search engine
-              </label>
-            </div>
+        <div class="row">
+          <div class="col-md-6">
+            <label for="select-GD">Development Terms</label>
+            <select id="select-GD" class="filters" name="GD filter" placeholder="Development Terms" multiple>
+              {% for key, value in FORM_GD.items %}
+                {% if key in form_gd %}
+                  <option value="{{ key }}" selected="selected">{{ value }}</option>
+                {% else %}
+                  <option value="{{ key }}">{{ value }}</option>
+                {% endif %}
+              {% endfor %}
+            </select> 
+          </div>
+          <div class="col-md-6">
+            <label for="select-O">Organisations</label>
+            <select id="select-O" class="filters" name="O filter" placeholder="Organisations" multiple>
+              {% for key, value in FORM_O.items %}
+                {% if key in form_o %}
+                  <option value="{{ key }}" selected="selected">{{ value }}</option>
+                {% else %}
+                  <option value="{{ key }}">{{ value }}</option>
+                {% endif %}
+              {% endfor %}
+            </select> 
+          </div>
         </div>
+
+        <hr class="form">
+        <div class="row">
+
+          <div class="col-md-2 pl-5 pt-1">
+            <input class="form-check-input" type="checkbox" value="1" id="old-search-engine-checkbox" name="search-engine">
+            <label class="form-check-label" for="old-search-engine-checkbox">
+              Old search type
+            </label>
+          </div>
+          <div class="col-md-2 pl-5 pt-1">
+            <input class="form-check-input" type="checkbox" value="on" id="highlight-checkbox" name="highlight" {% if not highlight_keywords %} checked {% endif %}>
+            <label class="form-check-label" for="highlight-checkbox">
+              Highlighting off
+            </label>
+          </div>
+          <div class="col-md-2 pl-2 pt-1">
+            <input class="form-check-input" type="checkbox" value="1" id="rank-10-checkbox" name="rank10" {% if not below_rank_10 %} checked {% endif %}>
+            <label class="form-check-label" for="rank-10-checkbox">
+              Include rank < 10
+            </label>
+          </div>
+        </div>
+      </div>
       </form>
         <div class="row"> 
-          <div class="col-md-6">
+          <div class="col-md-6 pl-5 pt-1">
             <p class="b">
               Matching records:
               <span class="font-weight-bold"> {{ total_matched_records|intcomma }} </span>
               (out of {{ total_records|intcomma }} records)
             </p>
+          </div>
+          <div class="col-md-2 text-right offset-md-2 d-none">
+            <button type="button" class="btn btn-warning text-white" id="btn-mark-now" data-toggle="tooltip" data-placement="top" title="Click to highlight key words and search terms. Note that this will momentarily slow down this page.">
+              <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+              Mark Now
+            </button>
           </div>
           <div class="col-md-2 text-left">
             <p class="b">
@@ -253,37 +217,27 @@
         <div class="col-md-2 text-left">
           <input id="abstract-toggle-btn" type="checkbox" checked data-toggle="toggle" data-on="Abridged Abstracts" data-off="Full Abstracts" data-onstyle="success" data-offstyle="danger" data-width="210" data-height="39">
         </div>
-        <div class="col-md-2 text-left d-none">
-          <div class="custom-control custom-checkbox mt-1" data-toggle="tooltip" data-placement="top" title="Click to highlight key words and search terms. Note that this will momentarily slow down this page." style="cursor: pointer;">
-              <input type="checkbox" class="custom-control-input" id="chkbx-mark_always">
-              <label class="custom-control-label" for="chkbx-mark_always"> Mark Always </label>
-          </div>
-        </div>
-
-        <div class="col-md-2">
+        <div class="col-md-2 pl-5 pr-5 pt-1">
           <form action="{% url 'zotero_export' %}" method="POST">
             {% csrf_token %}
             <input name="auth" type="hidden" value="{{ auth }}">
-            {% for publication in publications %}
+            {% for publication in page_obj %}
               <input name="ids[]" type="hidden" value="{{ publication.id }}">
             {% endfor %}
 
             <button class="btn btn-secondary btn-block"> RIS Export </button>
           </form>          
-
-        {% if highlight_keywords %}
-          <div class="row mt-1">
-              <ul class="legend col-md-12">
-                {% for key, values in KEYWORDS_LIST %}
-                  <li> <span class="mark{{ key }}"></span> {{ key }} </li>
-                {% endfor %}
-              </ul>
-          </div>
-        {% endif %}
         </div>
+            <div class="row mt-1">
+                <ul class="legend col-md pl-5 pt-1">
+                  {% for key, values in KEYWORDS_LIST %}
+                    <li> <span class="mark{{ key }}"></span> {{ key }} </li>
+                  {% endfor %}
+                </ul>
+            </div>
 
         <div class="row mt-6">
-          <div class="col-md-12">
+          <div class="col-md-12 pl-5 pr-5 pt-1">
 
             <table class="table table-bordered">
               <thead>
@@ -291,14 +245,14 @@
                   <th class="col-2"> Authors </th>
                   <th class="col-1"> Year </th>
                   <th class="col-2"> Title </th>
-                  <th class="col-4"> Abstract </th>
+                  <th class="col-3"> Abstract </th>
                   <th class="col-2"> Keywords </th>
                   <th class="col-1"> Links </th>
-                  <th class="col-1"> ID </th>
+                  <th class="col-1"> Rank </th>
                 </tr>
               </thead>
 
-              {% for publication in publications %}
+              {% for publication in page_obj %}
                 <tr class="d-flex">
                   <td class="col-2"> {{ publication.authors|check_availablity }} </td>
                   <td class="col-1"> {{ publication.year }} </td>
@@ -311,7 +265,7 @@
                       {% endif %}
                     </a>
                   </td>
-                  <td class="col-4 highlighter addReadMore showlesscontent" wordsLmt="{{ ABSTRACT_WORDS_LIMIT }}">
+                  <td class="col-3 highlighter wrap addReadMore showlesscontent" wordsLmt="{{ ABSTRACT_WORDS_LIMIT }}">
                     {% if highlight_keywords %}
                       {{ publication.abstract|check_availablity|replace_highlighted }}
                     {% else %}
@@ -325,7 +279,7 @@
                       {{ publication.keywords|check_availablity }}
                     {% endif %}
                   </td>
-                  <td class="col-1 wrap">
+                  <td class="col-1 highlighter wrap">
                     {% if publication.doi %}
                       <a href="https://doi.org/{{ publication.doi }}" target="_blank"> {{ publication.doi }} </a>
                       <br><br>
@@ -335,9 +289,7 @@
                       Google Scholar
                     </a>
                   </td>
-                  <td class="col-1 wrap font6">
-                    {{ publication.get_persisted_id }}
-                  </td>
+                  <td class="col-1"> {{ publication.relevance.relevance }} </td>
                 </tr>
               {% endfor %}
 
@@ -346,39 +298,39 @@
             <div class="d-flex">
               <ul class="pagination mx-auto">
 
-                {% if publications.has_previous %}
+                {% if page_obj.has_previous %}
                 <li class="page-item">
                     <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Previous">
                       <span aria-hidden="true">first</span>
                     </a>
                   </li>
                   <li class="page-item">
-                    <a class="page-link" href="?page={{ publications.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Previous">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Previous">
                       <span aria-hidden="true">&laquo;</span>
                     </a>
                   </li>
                 {% endif %}
 
-                {% for n in publications.paginator.page_range %}
-                  {% if publications.number == n %}
+                {% for n in page_obj.paginator.page_range %}
+                  {% if page_obj.number == n %}
                     <li class="page-item active">
                       <span class="page-link">{{ n }}<span class="sr-only">(current)</span></span>
                     </li>
-                  {% elif n > publications.number|add:'-5' and n < publications.number|add:'5' %}
+                  {% elif n > page_obj.number|add:'-5' and n < page_obj.number|add:'5' %}
                     <li class="page-item">
                       <a class="page-link" href="?page={{ n }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ n }}</a>
                     </li>
                   {% endif %}
                 {% endfor %}
 
-                {% if publications.has_next %}
+                {% if page_obj.has_next %}
                   <li class="page-item">
-                    <a class="page-link" href="?page={{ publications.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Next">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Next">
                       <span aria-hidden="true">&raquo;</span>
                     </a>
                   </li>
                   <li class="page-item">
-                    <a class="page-link" href="?page={{ publications.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Next">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Next">
                       <span aria-hidden="true">last</span>
                     </a>
                   </li>
@@ -426,7 +378,6 @@
     </script>
     <script type="text/javascript">
         function spinner() {
-            document.getElementById("wrapper").style.visibility = "hidden";
             document.getElementById("loading").style.visibility = "visible";
 
         }

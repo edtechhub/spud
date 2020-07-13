@@ -17,8 +17,8 @@ body {
 	color: white;
 }
 
-.markDterms {
-	background: blue;
+.markDevelopmentTerms {
+	background: #326791;
 	color: white;
 }
 
@@ -85,7 +85,7 @@ body {
 
 #loading {
   display: block;
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   z-index: 100;
@@ -97,3 +97,11 @@ body {
   background-position: center;
   visibility: hidden;
 }
+
+hr.form {
+  border-top: 4px solid black;
+}
+
+.legend { list-style: none; }
+.legend li { float: left; margin-right: 10px; }
+.legend span { border: 1px solid #ccc; float: left; width: 20px; height: 20px; margin: 2px; }
