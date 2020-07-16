@@ -1,387 +1,412 @@
+{% extends "publications/base.html" %}
+{% load humanize %}
 {% load static %}
 {% load publications_extras %}
 {% load highlighter %}
-{% load humanize %}
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
+{% block head %}
+<title>
+ETH SPuD - {{ tak }} ; page {{ page_obj.number }}
 
-    <title>
-      ETH SPuD - {{ tak }} ; page {{ page_obj.number }}
-
-      {% if year %}
-        ; {{ year }}
-      {% endif %}
-    </title>
-
-    <style type="text/css">img#wpstats{display:none}</style>
-    <link rel="icon" href="https://edtechhub.org/wp-content/uploads/2019/08/ETH-150x150.png" sizes="32x32">
-    <link rel="icon" href="https://edtechhub.org/wp-content/uploads/2019/08/ETH-300x300.png" sizes="192x192">
-    <link rel="apple-touch-icon-precomposed" href="https://edtechhub.org/wp-content/uploads/2019/08/ETH-300x300.png">
-    <meta name="msapplication-TileImage" content="https://edtechhub.org/wp-content/uploads/2019/08/ETH-300x300.png">
-
-    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
-    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap4-toggle.min.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'css/publications.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'css/text.expandable.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'css/selectize.default.css' %}" />
+{% if year %}
+  ; {{ year }}
+{% endif %}
+</title>
 
 
-  </head>
 
-  <body>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap4-toggle.min.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/text.expandable.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/selectize.default.css' %}" />
 
-    <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-      <a class="navbar-brand" href="/?limit=50&auth={{ auth }}">EdTechHub Searchable Publications Database</a>
-    </nav>
+{% endblock head %}
+{% block content %}
+<div id="timer">
+  <span id="minutes"></span>:<span id="seconds"></span>
+</div>
 
-    <div id="wrapper">
-      <main role="main" class="container-fluid" style="margin-top: 50px;">
-        <form action="{% url 'index' %}" method="GET" class="mb-3">
-          <input name="limit" type="hidden" value="{{ limit }}">
-          <input name="auth" type="hidden" value="{{ auth }}">      
-        <div class="form-row">
+<div id="wrapper">
+  <div id = "alert_placeholder" style="position: absolute; width: 100%; z-index: 1"></div>
+  <main role="main" class="container-fluid" style="margin-top: 50px;">
+    <form id="queryForm" class="needs-validation" action="{% url 'index' %}" method="GET" class="mb-3" onsubmit="event.preventDefault(); validate();" novalidate>
+      <input name="limit" type="hidden" value="{{ limit }}">
+      <input name="auth" type="hidden" value="{{ auth }}"> 
+    <div class="form-row">
 
-          <div class="col-md-7">
-            <input type="text" class="form-control" name="tak" value="{{ tak }}" placeholder="query">
-          </div>
-          <div class="col-md-1">
-            <input type="number" step="1" class="form-control" name="year" value="{{ year }}" placeholder="year">
-          </div>
-          <div class="col-md-2">
-            <input type="text" class="form-control" name="author" value="{{ author }}" placeholder="author">
-          </div>
-          <div class="col-md-1 text-right">
-            <button type="submit" class="btn btn-primary" id="search" onclick="spinner()"> Submit </button>
-          </div>
-
-        </div>
-        <hr class="form">
-        <div class="row">    
-          <div class="col">
-            <label for="select-GC">Country / Regions</label>
-            <select id="select-GC" class="filters" name="country/regions" placeholder="Country / Regions" multiple>
-              {% for key, value in FORM_GC_GR.items %}
-                {% if key in form_gc_gr %}
-                  <option value="{{ key }}" selected="selected">{{ value }}</option>
-                {% else %}
-                  <option value="{{ key }}">{{ value }}</option>
-                {% endif %}
-              {% endfor %}
-            </select> 
-          </div>
-          <div class="col-md-2 text-left">
-            <label for="min-hdi">Min-HDI</label>
-            <input type="number" step="0.01" min="0" max="1" class="form-control" name="min_hdi" value="{{ min_hdi }}" placeholder="Min-HDI">
-          </div>
-          <div class="col-md-2 text-left">
-            <label for="max-hdi">Max-HDI</label>
-            <input type="number" step="0.01" min="0" max="1" class="form-control" name="max_hdi" value="{{ max_hdi }}" placeholder="Max-HDI">
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col-md-6">
-            <label for="select-TE-TT">Technology: Education / Other</label>
-            <select id="select-TE-TT" class="filters" name="TE/TT filter" placeholder="Technology: Education / Other" multiple>
-              {% for key, value in FORM_TE_TT.items %}
-                {% if key in form_te_tt %}
-                  <option value="{{ key }}" selected="selected">{{ value }}</option>
-                {% else %}
-                  <option value="{{ key }}">{{ value }}</option>
-                {% endif %}
-              {% endfor %}
-            </select> 
-          </div>
-          <div class="col-md-6">
-            <label for="select-P1-P2">Population: Education level and Context</label>
-            <select id="select-P1-P2" class="filters" name="P1/P2 filter" placeholder="Population: Education level and Context" multiple>
-              {% for key, value in FORM_P1_P2.items %}
-                {% if key in form_p1_p2 %}
-                  <option value="{{ key }}" selected="selected">{{ value }}</option>
-                {% else %}
-                  <option value="{{ key }}">{{ value }}</option>
-                {% endif %}
-              {% endfor %}
-            </select> 
-          </div>
-        </div>
-        <div class="row">
-
-          <div class="col-md-6">
-            <label for="select-F">Focus</label>
-            <select id="select-F" class="filters" name="F filter" placeholder="Focus" multiple>
-              {% for key, value in FORM_F.items %}
-                {% if key in form_f %}
-                  <option value="{{ key }}" selected="selected"> {{ value }} </option>
-                {% else %}
-                  <option value="{{ key }}">{{ value }}</option>
-                {% endif %}
-              {% endfor %}
-            </select> 
-          </div>
-
-          <div class="col-md-6">
-            <label for="select-R">Research methods</label>
-            <select id="select-R" class="filters" name="R filter" placeholder="Research methods" multiple>
-              {% for key, value in FORM_R.items %}
-                {% if key in form_r %}
-                  <option value="{{ key }}" selected="selected">{{ value }}</option>
-                {% else %}
-                  <option value="{{ key }}">{{ value }}</option>
-                {% endif %}
-              {% endfor %}
-            </select> 
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-6">
-            <label for="select-GD">Development Terms</label>
-            <select id="select-GD" class="filters" name="GD filter" placeholder="Development Terms" multiple>
-              {% for key, value in FORM_GD.items %}
-                {% if key in form_gd %}
-                  <option value="{{ key }}" selected="selected">{{ value }}</option>
-                {% else %}
-                  <option value="{{ key }}">{{ value }}</option>
-                {% endif %}
-              {% endfor %}
-            </select> 
-          </div>
-          <div class="col-md-6">
-            <label for="select-O">Organisations</label>
-            <select id="select-O" class="filters" name="O filter" placeholder="Organisations" multiple>
-              {% for key, value in FORM_O.items %}
-                {% if key in form_o %}
-                  <option value="{{ key }}" selected="selected">{{ value }}</option>
-                {% else %}
-                  <option value="{{ key }}">{{ value }}</option>
-                {% endif %}
-              {% endfor %}
-            </select> 
-          </div>
-        </div>
-
-        <hr class="form">
-        <div class="row">
-
-          <div class="col-md-2 pl-5 pt-1">
-            <input class="form-check-input" type="checkbox" value="1" id="old-search-engine-checkbox" name="search-engine">
-            <label class="form-check-label" for="old-search-engine-checkbox">
-              Old search type
-            </label>
-          </div>
-          <div class="col-md-2 pl-5 pt-1">
-            <input class="form-check-input" type="checkbox" value="on" id="highlight-checkbox" name="highlight" {% if not highlight_keywords %} checked {% endif %}>
-            <label class="form-check-label" for="highlight-checkbox">
-              Highlighting off
-            </label>
-          </div>
-          <div class="col-md-2 pl-2 pt-1">
-            <input class="form-check-input" type="checkbox" value="1" id="rank-10-checkbox" name="rank10" {% if not below_rank_10 %} checked {% endif %}>
-            <label class="form-check-label" for="rank-10-checkbox">
-              Include rank < 10
-            </label>
-          </div>
-        </div>
+      <div class="col-md-6">
+        <input type="text" class="form-control" name="tak" value="{{ tak }}" placeholder="query..">
       </div>
-      </form>
-        <div class="row"> 
-          <div class="col-md-6 pl-5 pt-1">
-            <p class="b">
-              Matching records:
-              <span class="font-weight-bold"> {{ total_matched_records|intcomma }} </span>
-              (out of {{ total_records|intcomma }} records)
-            </p>
-          </div>
-          <div class="col-md-2 text-right offset-md-2 d-none">
-            <button type="button" class="btn btn-warning text-white" id="btn-mark-now" data-toggle="tooltip" data-placement="top" title="Click to highlight key words and search terms. Note that this will momentarily slow down this page.">
-              <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-              Mark Now
-            </button>
-          </div>
-          <div class="col-md-2 text-left">
-            <p class="b">
-              Search time: {{ timer }}s
-            </p>
-          </div>
+      <div class="col-md-1">
+        <input type="number" step="1" class="form-control" id="yearmin" name="yearmin" value="{{ yearmin }}" placeholder="year min..">
+      </div>
+      <div class="col-md-1">
+        <input type="number" step="1" class="form-control" id="yearmax" name="yearmax" value="{{ yearmax }}" placeholder="year max..">
+      </div>
+      <div class="col-md-2">
+        <input type="text" class="form-control" name="author" value="{{ author }}" placeholder="author..">
+      </div>
+      <div class="col-md-1 text-right">
+        <button class="btn btn-primary" id="search" type="submit"> Submit </button>
+      </div>
 
-        <div class="col-md-2 text-left">
-          <input id="abstract-toggle-btn" type="checkbox" checked data-toggle="toggle" data-on="Abridged Abstracts" data-off="Full Abstracts" data-onstyle="success" data-offstyle="danger" data-width="210" data-height="39">
+    </div>
+    <hr class="form">
+    <div class="row">    
+      <div class="col-md-6">
+        <label for="select-GC"><strong>Country / Regions:</strong></label>
+        <select id="select-GC" class="filters" name="country/regions" placeholder="Country / Regions" multiple>
+          {% for key, value in FORM_GC_GR.items %}
+            {% if key in form_gc_gr %}
+              <option value="{{ key }}" selected="selected">{{ value }}</option>
+            {% else %}
+              <option value="{{ key }}">{{ value }}</option>
+            {% endif %}
+          {% endfor %}
+        </select> 
+      </div>
+      <div class="col-md-1 offset-md-1 text-left">
+        <label for="min-hdi"><strong>Min-HDI:</strong></label>
+        <input type="number" step="0.01" min="0" max="1" class="form-control" name="min_hdi" value="{{ min_hdi }}" placeholder="Min-HDI..">
+      </div>
+      <div class="col-md-1 text-left">
+        <label for="max-hdi"><strong>Max-HDI:</strong></label>
+        <input type="number" step="0.01" min="0" max="1" class="form-control" name="max_hdi" value="{{ max_hdi }}" placeholder="Max-HDI..">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <label for="select-TE-TT"><strong>Technology: Education / Other:</strong></label>
+        <select id="select-TE-TT" class="filters" name="TE/TT filter" placeholder="Technology: Education / Other.." multiple>
+          {% for key, value in FORM_TE_TT.items %}
+            {% if key in form_te_tt %}
+              <option value="{{ key }}" selected="selected">{{ value }}</option>
+            {% else %}
+              <option value="{{ key }}">{{ value }}</option>
+            {% endif %}
+          {% endfor %}
+        </select> 
+      </div>
+      <div class="col-md-6">
+        <label for="select-P1-P2"><strong>Population: Education level and Context:</strong></label>
+        <select id="select-P1-P2" class="filters" name="P1/P2 filter" placeholder="Population: Education level and Context.." multiple>
+          {% for key, value in FORM_P1_P2.items %}
+            {% if key in form_p1_p2 %}
+              <option value="{{ key }}" selected="selected">{{ value }}</option>
+            {% else %}
+              <option value="{{ key }}">{{ value }}</option>
+            {% endif %}
+          {% endfor %}
+        </select> 
+      </div>
+    </div>
+    <div class="row">
+
+      <div class="col-md-6">
+        <label for="select-F"><strong>Focus:</strong></label>
+        <select id="select-F" class="filters" name="F filter" placeholder="Focus.." multiple>
+          {% for key, value in FORM_F.items %}
+            {% if key in form_f %}
+              <option value="{{ key }}" selected="selected"> {{ value }} </option>
+            {% else %}
+              <option value="{{ key }}">{{ value }}</option>
+            {% endif %}
+          {% endfor %}
+        </select> 
+      </div>
+
+      <div class="col-md-6">
+        <label for="select-R"><strong>Research methods:</strong></label>
+        <select id="select-R" class="filters" name="R filter" placeholder="Research methods.." multiple>
+          {% for key, value in FORM_R.items %}
+            {% if key in form_r %}
+              <option value="{{ key }}" selected="selected">{{ value }}</option>
+            {% else %}
+              <option value="{{ key }}">{{ value }}</option>
+            {% endif %}
+          {% endfor %}
+        </select> 
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6">
+        <label for="select-GD"><strong>Development Terms:</strong></label>
+        <select id="select-GD" class="filters" name="GD filter" placeholder="Development Terms.." multiple>
+          {% for key, value in FORM_GD.items %}
+            {% if key in form_gd %}
+              <option value="{{ key }}" selected="selected">{{ value }}</option>
+            {% else %}
+              <option value="{{ key }}">{{ value }}</option>
+            {% endif %}
+          {% endfor %}
+        </select> 
+      </div>
+      <div class="col-md-6">
+        <label for="select-O"><strong>Organisations:</strong></label>
+        <select id="select-O" class="filters" name="O filter" placeholder="Organisations.." multiple>
+          {% for key, value in FORM_O.items %}
+            {% if key in form_o %}
+              <option value="{{ key }}" selected="selected">{{ value }}</option>
+            {% else %}
+              <option value="{{ key }}">{{ value }}</option>
+            {% endif %}
+          {% endfor %}
+        </select> 
+      </div>
+    </div>
+
+    <hr class="form">
+    <div class="row">
+
+      <div class="col-md-2 pl-5 pt-1">
+        <input class="form-check-input" type="checkbox" value="1" id="old-search-engine-checkbox" name="search-engine">
+        <label class="form-check-label" for="old-search-engine-checkbox">
+          Old search type
+        </label>
+      </div>
+      <div class="col-md-2 pl-5 pt-1">
+        <input class="form-check-input" type="checkbox" value="on" id="highlight-checkbox" name="highlight" {% if not highlight_keywords %} checked {% endif %}>
+        <label class="form-check-label" for="highlight-checkbox">
+          Highlighting off
+        </label>
+      </div>
+      <div class="col-md-2 pl-2 pt-1">
+        <input class="form-check-input" type="checkbox" value="1" id="rank-10-checkbox" name="rank10" {% if not below_rank_10 %} checked {% endif %}>
+        <label class="form-check-label" for="rank-10-checkbox">
+          Include rank < 10
+        </label>
+      </div>
+    </div>
+  </form>
+    <div class="row"> 
+      <div class="col-md-6 pl-5 pt-1">
+        <p class="b">
+          Matching records:
+          <span class="font-weight-bold"> {{ total_matched_records|intcomma }} </span>
+          (out of {{ total_records|intcomma }} records)
+        </p>
+      </div>
+      <div class="col-md-2 text-right offset-md-2 d-none">
+        <button type="button" class="btn btn-warning text-white" id="btn-mark-now" data-toggle="tooltip" data-placement="top" title="Click to highlight key words and search terms. Note that this will momentarily slow down this page.">
+          <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+          Mark Now
+        </button>
+      </div>
+
+      <!--Timer off for now
+
+      <div class="col-md-2 text-left">
+        <p class="b">
+          Search time: {{ timer }}s
+        </p>
+      </div>-->
+
+    <div class="col-md-2 text-left">
+      <input id="abstract-toggle-btn" type="checkbox" checked data-toggle="toggle" data-on="Abridged Abstracts" data-off="Full Abstracts" data-onstyle="success" data-offstyle="danger" data-width="210" data-height="39">
+    </div>
+    <div class="col-md-2 pl-5 pr-5 pt-1">
+      <form action="{% url 'zotero_export' %}" method="POST">
+        {% csrf_token %}
+        <input name="auth" type="hidden" value="{{ auth }}">
+        {% for publication in page_obj %}
+          <input name="ids[]" type="hidden" value="{{ publication.id }}">
+        {% endfor %}
+
+        <button class="btn btn-secondary btn-block"> RIS Export </button>
+      </form>          
+    </div>
+        <div class="row mt-1">
+            <ul class="legend col-md pl-5 pt-1">
+              {% for key, values in KEYWORDS_LIST %}
+                <li> <span class="mark{{ key }}"></span> {{ key }} </li>
+              {% endfor %}
+            </ul>
         </div>
-        <div class="col-md-2 pl-5 pr-5 pt-1">
-          <form action="{% url 'zotero_export' %}" method="POST">
-            {% csrf_token %}
-            <input name="auth" type="hidden" value="{{ auth }}">
-            {% for publication in page_obj %}
-              <input name="ids[]" type="hidden" value="{{ publication.id }}">
+
+    <div class="row mt-6">
+      <div class="col-md-12 pl-5 pr-5 pt-1">
+
+        <table class="table table-bordered">
+          <thead>
+            <tr class="text-center d-flex">
+              <th class="col-2"> Authors </th>
+              <th class="col-1"> Year </th>
+              <th class="col-2"> Title </th>
+              <th class="col-3"> Abstract </th>
+              <th class="col-2"> Keywords </th>
+              <th class="col-1"> Links </th>
+              <th class="col-1"> Rank </th>
+            </tr>
+          </thead>
+
+          {% for publication in page_obj %}
+            <tr class="d-flex">
+              <td class="col-2"> {{ publication.authors|check_availablity }} </td>
+              <td class="col-1"> {{ publication.year }} </td>
+              <td class="col-2 highlighter">
+                <a href="{% url 'showrecord'%}?auth={{ auth }}&importedfrom={{ publication.get_persisted_id | urlencode }}&id={{ publication.id }}&highlight={{ highlight_param }}" target="_blank">
+                  {% if highlight_keywords %}
+                    {{ publication.title|check_availablity|replace_highlighted }}
+                  {% else %}
+                    {{ publication.title|check_availablity }}
+                  {% endif %}
+                </a>
+              </td>
+              <td class="col-3 highlighter wrap addReadMore showlesscontent" wordsLmt="{{ ABSTRACT_WORDS_LIMIT }}">
+                {% if highlight_keywords %}
+                  {{ publication.abstract|check_availablity|replace_highlighted }}
+                {% else %}
+                  {{ publication.abstract|check_availablity }}
+                {% endif %}
+              </td>
+              <td class="col-2 highlighter wrap">
+                {% if highlight_keywords %}
+                  {{ publication.keywords|check_availablity|replace_highlighted }}
+                {% else %}
+                  {{ publication.keywords|check_availablity }}
+                {% endif %}
+              </td>
+              <td class="col-1 highlighter wrap">
+                {% if publication.doi %}
+                  <a href="https://doi.org/{{ publication.doi }}" target="_blank"> {{ publication.doi }} </a>
+                  <br><br>
+                {% endif %}
+
+                <a href="https://scholar.google.co.uk/scholar?q={{ publication.title }}" target="_blank">
+                  Google Scholar
+                </a>
+              </td>
+              <td class="col-1"> {{ publication.relevance.relevance }} </td>
+            </tr>
+          {% endfor %}
+
+        </table>
+
+        <div class="d-flex">
+          <ul class="pagination mx-auto">
+
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Previous">
+                  <span aria-hidden="true">first</span>
+                </a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Previous">
+                  <span aria-hidden="true">&laquo;</span>
+                </a>
+              </li>
+            {% endif %}
+
+            {% for n in page_obj.paginator.page_range %}
+              {% if page_obj.number == n %}
+                <li class="page-item active">
+                  <span class="page-link">{{ n }}<span class="sr-only">(current)</span></span>
+                </li>
+              {% elif n > page_obj.number|add:'-5' and n < page_obj.number|add:'5' %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ n }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ n }}</a>
+                </li>
+              {% endif %}
             {% endfor %}
 
-            <button class="btn btn-secondary btn-block"> RIS Export </button>
-          </form>          
-        </div>
-            <div class="row mt-1">
-                <ul class="legend col-md pl-5 pt-1">
-                  {% for key, values in KEYWORDS_LIST %}
-                    <li> <span class="mark{{ key }}"></span> {{ key }} </li>
-                  {% endfor %}
-                </ul>
-            </div>
-
-        <div class="row mt-6">
-          <div class="col-md-12 pl-5 pr-5 pt-1">
-
-            <table class="table table-bordered">
-              <thead>
-                <tr class="text-center d-flex">
-                  <th class="col-2"> Authors </th>
-                  <th class="col-1"> Year </th>
-                  <th class="col-2"> Title </th>
-                  <th class="col-3"> Abstract </th>
-                  <th class="col-2"> Keywords </th>
-                  <th class="col-1"> Links </th>
-                  <th class="col-1"> Rank </th>
-                </tr>
-              </thead>
-
-              {% for publication in page_obj %}
-                <tr class="d-flex">
-                  <td class="col-2"> {{ publication.authors|check_availablity }} </td>
-                  <td class="col-1"> {{ publication.year }} </td>
-                  <td class="col-2 highlighter">
-                    <a href="{% url 'showrecord'%}?auth={{ auth }}&importedfrom={{ publication.get_persisted_id | urlencode }}&id={{ publication.id }}&highlight={{ highlight_param }}" target="_blank">
-                      {% if highlight_keywords %}
-                        {{ publication.title|check_availablity|replace_highlighted }}
-                      {% else %}
-                        {{ publication.title|check_availablity }}
-                      {% endif %}
-                    </a>
-                  </td>
-                  <td class="col-3 highlighter wrap addReadMore showlesscontent" wordsLmt="{{ ABSTRACT_WORDS_LIMIT }}">
-                    {% if highlight_keywords %}
-                      {{ publication.abstract|check_availablity|replace_highlighted }}
-                    {% else %}
-                      {{ publication.abstract|check_availablity }}
-                    {% endif %}
-                  </td>
-                  <td class="col-2 highlighter wrap">
-                    {% if highlight_keywords %}
-                      {{ publication.keywords|check_availablity|replace_highlighted }}
-                    {% else %}
-                      {{ publication.keywords|check_availablity }}
-                    {% endif %}
-                  </td>
-                  <td class="col-1 highlighter wrap">
-                    {% if publication.doi %}
-                      <a href="https://doi.org/{{ publication.doi }}" target="_blank"> {{ publication.doi }} </a>
-                      <br><br>
-                    {% endif %}
-
-                    <a href="https://scholar.google.co.uk/scholar?q={{ publication.title }}" target="_blank">
-                      Google Scholar
-                    </a>
-                  </td>
-                  <td class="col-1"> {{ publication.relevance.relevance }} </td>
-                </tr>
-              {% endfor %}
-
-            </table>
-
-            <div class="d-flex">
-              <ul class="pagination mx-auto">
-
-                {% if page_obj.has_previous %}
-                <li class="page-item">
-                    <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Previous">
-                      <span aria-hidden="true">first</span>
-                    </a>
-                  </li>
-                  <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Previous">
-                      <span aria-hidden="true">&laquo;</span>
-                    </a>
-                  </li>
-                {% endif %}
-
-                {% for n in page_obj.paginator.page_range %}
-                  {% if page_obj.number == n %}
-                    <li class="page-item active">
-                      <span class="page-link">{{ n }}<span class="sr-only">(current)</span></span>
-                    </li>
-                  {% elif n > page_obj.number|add:'-5' and n < page_obj.number|add:'5' %}
-                    <li class="page-item">
-                      <a class="page-link" href="?page={{ n }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ n }}</a>
-                    </li>
-                  {% endif %}
-                {% endfor %}
-
-                {% if page_obj.has_next %}
-                  <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Next">
-                      <span aria-hidden="true">&raquo;</span>
-                    </a>
-                  </li>
-                  <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Next">
-                      <span aria-hidden="true">last</span>
-                    </a>
-                  </li>
-                {% endif %}
-              </ul>
-            </div>
-
-            <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-              Show Query
-            </button>
-            <br><br>
-            <div class="collapse" id="collapseExample">
-              <p class="b"> Query: <span class="font-weight-bold"> {{ q__q }} </span> </p>
-              <p class="b"> Timestamp: <span class="font-weight-bold"> {{ ""|timestamp }} </span> </p>
-            </div>
-
-          </div>
+            {% if page_obj.has_next %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Next">
+                  <span aria-hidden="true">&raquo;</span>
+                </a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Next">
+                  <span aria-hidden="true">last</span>
+                </a>
+              </li>
+            {% endif %}
+          </ul>
         </div>
 
-      </main>
+        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+          Show Query
+        </button>
+        <br><br>
+        <div class="collapse" id="collapseExample">
+          <p class="b"> Query: <span class="font-weight-bold"> {{ q__q }} </span> </p>
+          <p class="b"> Timestamp: <span class="font-weight-bold"> {{ ""|timestamp }} </span> </p>
+        </div>
+
+      </div>
     </div>
-    <div id="loading"></div>
-    <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
-    <!-- <script src="{% static 'js/jquery-3.4.1.slim.min.js' %}"></script> -->
-    <script src="{% static 'js/popper.min.js' %}"></script>
-    <script src="{% static 'js/bootstrap.min.js' %}"></script>
-    <script src="{% static 'js/bootstrap4-toggle.min.js' %}"></script>
-    <script src="{% static 'js/jquery.cookie.min.js' %}"></script>
-    <script src="{% static 'js/jquery.mark.js' %}"></script>
-    <script src="{% static 'js/text.expandable.js' %}"></script>
-    <script src="{% static 'js/selectize.js' %}"></script>
+  </main>
+</div>
+</div>
+<div id="loading">
+</div>
+{% endblock content %}
+{% block scripts %}
+<script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+<!-- <script src="{% static 'js/jquery-3.4.1.slim.min.js' %}"></script> -->
+<script src="{% static 'js/popper.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+<script src="{% static 'js/bootstrap4-toggle.min.js' %}"></script>
+<script src="{% static 'js/jquery.cookie.min.js' %}"></script>
+<script src="{% static 'js/jquery.mark.js' %}"></script>
+<script src="{% static 'js/text.expandable.js' %}"></script>
+<script src="{% static 'js/selectize.js' %}"></script>
 
-    <script src="{% static 'js/publications.js' %}"></script>
+<script src="{% static 'js/publications.js' %}"></script>
 
-    <script>
-    $('.filters').selectize({
-      plugins: ['remove_button'],
-      delimiter: ',',
-      sortField: {
-        field: 'text',
-        direction: 'asc'
-      },
-      dropdownParent: 'body',
-    });
-    </script>
-    <script type="text/javascript">
-        function spinner() {
-            document.getElementById("loading").style.visibility = "visible";
+<script>
+$('.filters').selectize({
+  plugins: ['remove_button'],
+  delimiter: ',',
+  sortField: {
+    field: 'text',
+    direction: 'asc'
+  },
+  dropdownParent: 'body',
+});
+</script>
+<script>
 
-        }
-    </script>    
+function showAlert() {
 
-  </body>
-</html>
+    $('#alert_placeholder').append('<div id="alertdiv" class="alert alert-danger alert-dismissible fade show" role="alert"> Start year has to be smaller or equal to end year. <button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">&times;</span> </button> </div>')
+
+    setTimeout(function() { // this will automatically close the alert and remove this if the users doesnt close it in 5 secs
+
+
+      $("#alertdiv").remove();
+
+    }, 5000);
+}
+
+function spinner() {
+  document.getElementById("loading").style.visibility = "visible";
+  document.getElementById("timer").style.visibility = "visible";
+  document.getElementById("wrapper").style.visibility = "hidden";
+  var sec = 0;
+  function pad ( val ) { return val > 9 ? val : "0" + val; }
+  setInterval( function(){
+  document.getElementById("seconds").innerHTML=pad(++sec%60);
+  document.getElementById("minutes").innerHTML=pad(parseInt(sec/60,10));
+  }, 1000);
+}
+
+function validate() {
+  var x = document.getElementById("yearmin").value;
+  var y = document.getElementById("yearmax").value;
+
+  if (x > y) {
+    document.getElementById("yearmin").style.borderColor = "red";
+    document.getElementById("yearmax").style.borderColor = "red";
+    showAlert();
+} 
+  else {
+    document.getElementById("queryForm").submit();
+    spinner();
+}
+}
+
+</script>
+{% endblock scripts %}

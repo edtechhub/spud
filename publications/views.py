@@ -25,11 +25,12 @@ def authenticate_user(function):
 @require_http_methods(["GET"])
 @authenticate_user
 def index(request):
-    start = time.time()
+    #start = time.time()
 
     auth = request.GET.get('auth', '')
 
-    year = request.GET.get('year', '').strip()
+    yearmin = request.GET.get('yearmin', '').strip()
+    yearmax = request.GET.get('yearmax', '').strip()
     tak = request.GET.get('tak', '').strip()
     author = request.GET.get('author', '').strip()
     min_hdi = request.GET.get('min_hdi', '').strip()
@@ -55,10 +56,10 @@ def index(request):
         min_hdi = 0
 
     if search_engine == 'off':
-         publications_list = Publication.objects.select_related('relevance').filter(query_function(tak, author, year, form_gc_gr, form_gd, form_p1_p2, form_te_tt, form_f, form_o, form_r, below_rank_10, min_hdi, max_hdi)).order_by('-relevance__relevance').defer('tsv', 'tsa', 'tak')
+         publications_list = Publication.objects.select_related('relevance').filter(query_function(tak, author, yearmin, yearmax, form_gc_gr, form_gd, form_p1_p2, form_te_tt, form_f, form_o, form_r, below_rank_10, min_hdi, max_hdi)).order_by('-relevance__relevance').only("id", "title", "authors", "year", "doi", "keywords", "abstract", "relevance", "importedfrom")
     else:
         q_year = q_tak = q_with = Q()
-        if year: q_year = Q(year=year)
+        if year_min: q_year = Q(year=yearmin)
 
         if tak: q_tak = formulate_tak_query(tak)
 
@@ -86,7 +87,8 @@ def index(request):
         'page_obj': page_obj,
         'total_records': total_records,
         'total_matched_records': total_matched_records,
-        'year': year,
+        'yearmin': yearmin,
+        'yearmax': yearmax,
         'tak': tak,
         'author': author,
         'limit': per_page,
@@ -116,7 +118,7 @@ def index(request):
 
         'auth': settings.AUTH_KEY,
         'q__q': q__q,
-        'timer': str(round(time.time() - start, 2)),
+        #'timer': str(round(time.time() - start, 2)),
 
     }
     return render(request, 'publications/index.html', context)
@@ -140,6 +142,14 @@ def showrecord(request):
     }
 
     return render(request, 'publications/showrecord.html', context)
+
+@authenticate_user
+def changelog(request):
+    auth = request.GET.get('auth', '')
+    context = {
+        'auth': settings.AUTH_KEY,
+    }
+    return render(request, 'publications/changelog.html', context)
 
 @require_http_methods(["POST"])
 @authenticate_user
