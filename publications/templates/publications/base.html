@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <style type="text/css">img#wpstats{display:none}</style>
+    <link rel="icon" href="https://edtechhub.org/wp-content/uploads/2019/08/ETH-150x150.png" sizes="32x32">
+    <link rel="icon" href="https://edtechhub.org/wp-content/uploads/2019/08/ETH-300x300.png" sizes="192x192">
+    <link rel="apple-touch-icon-precomposed" href="https://edtechhub.org/wp-content/uploads/2019/08/ETH-300x300.png">
+    <meta name="msapplication-TileImage" content="https://edtechhub.org/wp-content/uploads/2019/08/ETH-300x300.png">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/publications.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
+    {% block head %}{% endblock head %}
+</head>
+<body>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+        <a class="navbar-brand" href="/?limit=50&auth={{ auth }}">EdTechHub Searchable Publications Database</a>
+    </nav>
+    {% block content %}{% endblock content %}
+    <!-- Footer -->
+    <footer class="footer bg-dark pl-5 pr-5 py-3">
+        <p> © 2020 Copyright: <a href="https://edtechhub.org/">EdTechHub</a></p>
+        <p>SPUD, Version 1.13, 2020-07-14</p>
+        <button onclick="topFunction()" class="btn btn-danger" id="topBtn" title="Go to top">Go to top</button>
+    </footer>
+    {% block scripts %}{% endblock scripts %}
+    <script>
+    function topFunction() {
+        document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0;
+        }
+    </script>
+</body>
+</html>

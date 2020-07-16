@@ -1190,7 +1190,7 @@ def check_hdi(bottom_value, top_value, value_index, country):
         return True
 
 
-def query_function(tak=None, author=None, year=None, form_gc_gr=None, form_gd=None, form_p1_p2=None, form_te_tt=None, form_f=None, form_o=None, form_r=None, below_rank_10=True, min_hdi=None, max_hdi=None):
+def query_function(tak=None, author=None, yearmin=None, yearmax=None, form_gc_gr=None, form_gd=None, form_p1_p2=None, form_te_tt=None, form_f=None, form_o=None, form_r=None, below_rank_10=True, min_hdi=None, max_hdi=None):
     large_filter = Q()
     if tak:
         tak_query = SearchQuery(tak, search_type='websearch')
@@ -1198,8 +1198,10 @@ def query_function(tak=None, author=None, year=None, form_gc_gr=None, form_gd=No
     if author:
         author_query = SearchQuery(author, search_type='websearch')
         large_filter &= Q(tsa=author_query)
-    if year:
-        large_filter &= Q(year=year)
+    if yearmin:
+        large_filter &= Q(year__gte=yearmin)
+    if yearmax:
+        large_filter &= Q(year__lte=yearmax)
     if form_gc_gr and form_gd:
         g_query = Q()
         for gc_gr_value in form_gc_gr:
