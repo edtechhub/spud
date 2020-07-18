@@ -22,40 +22,39 @@ ETH SPuD - {{ tak }} ; page {{ page_obj.number }}
 
 {% endblock head %}
 {% block content %}
+<div id = "alert_placeholder" style="position: absolute; width: 100%; z-index: 1000"></div>
 <div id="timer">
   <span id="minutes"></span>:<span id="seconds"></span>
 </div>
-
 <div id="wrapper">
-  <div id = "alert_placeholder" style="position: absolute; width: 100%; z-index: 1"></div>
   <main role="main" class="container-fluid" style="margin-top: 50px;">
     <form id="queryForm" class="needs-validation" action="{% url 'index' %}" method="GET" class="mb-3" onsubmit="event.preventDefault(); validate();" novalidate>
       <input name="limit" type="hidden" value="{{ limit }}">
       <input name="auth" type="hidden" value="{{ auth }}"> 
-    <div class="form-row">
+    <div class="form-row pl-4 pr-4">
 
       <div class="col-md-6">
         <input type="text" class="form-control" name="tak" value="{{ tak }}" placeholder="query..">
       </div>
-      <div class="col-md-1">
-        <input type="number" step="1" class="form-control" id="yearmin" name="yearmin" value="{{ yearmin }}" placeholder="year min..">
+      <div class="col-md-1 ">
+        <input type="number" step="1" class="form-control" id="yearmin" name="ymin" value="{{ yearmin }}" placeholder="year min..">
       </div>
       <div class="col-md-1">
-        <input type="number" step="1" class="form-control" id="yearmax" name="yearmax" value="{{ yearmax }}" placeholder="year max..">
+        <input type="number" step="1" class="form-control" id="yearmax" name="ymax" value="{{ yearmax }}" placeholder="year max..">
       </div>
       <div class="col-md-2">
         <input type="text" class="form-control" name="author" value="{{ author }}" placeholder="author..">
       </div>
       <div class="col-md-1 text-right">
-        <button class="btn btn-primary" id="search" type="submit"> Submit </button>
+        <button class="btn btn-primary" id="btn-submit" type="submit"> Submit </button>
       </div>
 
     </div>
     <hr class="form">
-    <div class="row">    
+    <div class="row pl-4 pr-4">    
       <div class="col-md-6">
         <label for="select-GC"><strong>Country / Regions:</strong></label>
-        <select id="select-GC" class="filters" name="country/regions" placeholder="Country / Regions" multiple>
+        <select id="select-GC" class="filters" name="GCGR" placeholder="Country / Regions" multiple>
           {% for key, value in FORM_GC_GR.items %}
             {% if key in form_gc_gr %}
               <option value="{{ key }}" selected="selected">{{ value }}</option>
@@ -65,20 +64,20 @@ ETH SPuD - {{ tak }} ; page {{ page_obj.number }}
           {% endfor %}
         </select> 
       </div>
-      <div class="col-md-1 offset-md-1 text-left">
+      <div class="col-md-1 text-left">
         <label for="min-hdi"><strong>Min-HDI:</strong></label>
-        <input type="number" step="0.01" min="0" max="1" class="form-control" name="min_hdi" value="{{ min_hdi }}" placeholder="Min-HDI..">
+        <input type="number" step="0.01" min="0" max="1" class="form-control" name="hmin" value="{{ min_hdi }}" placeholder="Min-HDI..">
       </div>
       <div class="col-md-1 text-left">
         <label for="max-hdi"><strong>Max-HDI:</strong></label>
-        <input type="number" step="0.01" min="0" max="1" class="form-control" name="max_hdi" value="{{ max_hdi }}" placeholder="Max-HDI..">
+        <input type="number" step="0.01" min="0" max="1" class="form-control" name="hmax" value="{{ max_hdi }}" placeholder="Max-HDI..">
       </div>
     </div>
 
-    <div class="row">
+    <div class="row pl-4 pr-4">
       <div class="col-md-6">
         <label for="select-TE-TT"><strong>Technology: Education / Other:</strong></label>
-        <select id="select-TE-TT" class="filters" name="TE/TT filter" placeholder="Technology: Education / Other.." multiple>
+        <select id="select-TE-TT" class="filters" name="TETT" placeholder="Technology: Education / Other.." multiple>
           {% for key, value in FORM_TE_TT.items %}
             {% if key in form_te_tt %}
               <option value="{{ key }}" selected="selected">{{ value }}</option>
@@ -90,7 +89,7 @@ ETH SPuD - {{ tak }} ; page {{ page_obj.number }}
       </div>
       <div class="col-md-6">
         <label for="select-P1-P2"><strong>Population: Education level and Context:</strong></label>
-        <select id="select-P1-P2" class="filters" name="P1/P2 filter" placeholder="Population: Education level and Context.." multiple>
+        <select id="select-P1-P2" class="filters" name="P1P2" placeholder="Population: Education level and Context.." multiple>
           {% for key, value in FORM_P1_P2.items %}
             {% if key in form_p1_p2 %}
               <option value="{{ key }}" selected="selected">{{ value }}</option>
@@ -101,11 +100,11 @@ ETH SPuD - {{ tak }} ; page {{ page_obj.number }}
         </select> 
       </div>
     </div>
-    <div class="row">
+    <div class="row pl-4 pr-4">
 
       <div class="col-md-6">
         <label for="select-F"><strong>Focus:</strong></label>
-        <select id="select-F" class="filters" name="F filter" placeholder="Focus.." multiple>
+        <select id="select-F" class="filters" name="F" placeholder="Focus.." multiple>
           {% for key, value in FORM_F.items %}
             {% if key in form_f %}
               <option value="{{ key }}" selected="selected"> {{ value }} </option>
@@ -118,7 +117,7 @@ ETH SPuD - {{ tak }} ; page {{ page_obj.number }}
 
       <div class="col-md-6">
         <label for="select-R"><strong>Research methods:</strong></label>
-        <select id="select-R" class="filters" name="R filter" placeholder="Research methods.." multiple>
+        <select id="select-R" class="filters" name="R" placeholder="Research methods.." multiple>
           {% for key, value in FORM_R.items %}
             {% if key in form_r %}
               <option value="{{ key }}" selected="selected">{{ value }}</option>
@@ -129,10 +128,10 @@ ETH SPuD - {{ tak }} ; page {{ page_obj.number }}
         </select> 
       </div>
     </div>
-    <div class="row">
+    <div class="row pl-4 pr-4">
       <div class="col-md-6">
         <label for="select-GD"><strong>Development Terms:</strong></label>
-        <select id="select-GD" class="filters" name="GD filter" placeholder="Development Terms.." multiple>
+        <select id="select-GD" class="filters" name="GD" placeholder="Development Terms.." multiple>
           {% for key, value in FORM_GD.items %}
             {% if key in form_gd %}
               <option value="{{ key }}" selected="selected">{{ value }}</option>
@@ -144,7 +143,7 @@ ETH SPuD - {{ tak }} ; page {{ page_obj.number }}
       </div>
       <div class="col-md-6">
         <label for="select-O"><strong>Organisations:</strong></label>
-        <select id="select-O" class="filters" name="O filter" placeholder="Organisations.." multiple>
+        <select id="select-O" class="filters" name="O" placeholder="Organisations.." multiple>
           {% for key, value in FORM_O.items %}
             {% if key in form_o %}
               <option value="{{ key }}" selected="selected">{{ value }}</option>
@@ -157,21 +156,21 @@ ETH SPuD - {{ tak }} ; page {{ page_obj.number }}
     </div>
 
     <hr class="form">
-    <div class="row">
+    <div class="row pl-5 pr-5">
 
-      <div class="col-md-2 pl-5 pt-1">
-        <input class="form-check-input" type="checkbox" value="1" id="old-search-engine-checkbox" name="search-engine">
+      <div class="col-md-2">
+        <input class="form-check-input" type="checkbox" value="1" id="old-search-engine-checkbox" name="search">
         <label class="form-check-label" for="old-search-engine-checkbox">
           Old search type
         </label>
       </div>
-      <div class="col-md-2 pl-5 pt-1">
-        <input class="form-check-input" type="checkbox" value="on" id="highlight-checkbox" name="highlight" {% if not highlight_keywords %} checked {% endif %}>
+      <div class="col-md-2">
+        <input class="form-check-input" type="checkbox" value="on" id="highlight-checkbox" name="hlight" {% if not highlight_keywords %} checked {% endif %}>
         <label class="form-check-label" for="highlight-checkbox">
           Highlighting off
         </label>
       </div>
-      <div class="col-md-2 pl-2 pt-1">
+      <div class="col-md-2">
         <input class="form-check-input" type="checkbox" value="1" id="rank-10-checkbox" name="rank10" {% if not below_rank_10 %} checked {% endif %}>
         <label class="form-check-label" for="rank-10-checkbox">
           Include rank < 10
@@ -179,8 +178,8 @@ ETH SPuD - {{ tak }} ; page {{ page_obj.number }}
       </div>
     </div>
   </form>
-    <div class="row"> 
-      <div class="col-md-6 pl-5 pt-1">
+    <div class="row pl-4 pr-4 pt-2"> 
+      <div class="col-md-6">
         <p class="b">
           Matching records:
           <span class="font-weight-bold"> {{ total_matched_records|intcomma }} </span>
@@ -202,27 +201,51 @@ ETH SPuD - {{ tak }} ; page {{ page_obj.number }}
         </p>
       </div>-->
 
-    <div class="col-md-2 text-left">
-      <input id="abstract-toggle-btn" type="checkbox" checked data-toggle="toggle" data-on="Abridged Abstracts" data-off="Full Abstracts" data-onstyle="success" data-offstyle="danger" data-width="210" data-height="39">
+      <div class="col-md-2 offset-md-2 text-left">
+        <input id="abstract-toggle-btn" type="checkbox" checked data-toggle="toggle" data-on="Abridged Abstracts" data-off="Full Abstracts" data-onstyle="success" data-offstyle="danger" data-width="210" data-height="39">
+      </div>
+      <div class="col-md-2 pl-5 pr-5 pt-1">
+        <form action="{% url 'zotero_export' %}" method="POST">
+          {% csrf_token %}
+          <input name="auth" type="hidden" value="{{ auth }}">
+          <input name="tak" type="hidden" value="{{ tak }}">
+          <input name="year" type="hidden" value="{{ year }}">
+          <input name="author" type="hidden" value="{{ author }}">
+          {% for values in form_gc_gr %}
+            <input name="gc/gr" type="hidden" value="{{ values }}">
+          {% endfor %}            
+          {% for values in form_gd %}
+            <input name="gd" type="hidden" value="{{ values }}">
+          {% endfor %}
+          {% for values in form_f %}
+            <input name="f" type="hidden" value="{{ values }}">
+          {% endfor %}
+          {% for values in form_o %}
+            <input name="o" type="hidden" value="{{ values }}">
+          {% endfor %}
+          {% for values in form_p1_p2 %}
+            <input name="p1/pl-2" type="hidden" value="{{ values }}">
+          {% endfor %}
+          {% for values in form_r %}
+            <input name="r" type="hidden" value="{{ values }}">
+          {% endfor %}
+          {% for values in form_te_tt %}
+            <input name="te/tt" type="hidden" value="{{ values }}">
+          {% endfor %}
+          <input name="hmin" type="hidden" value="{{ min_hdi }}">
+          <input name="hmax" type="hidden" value="{{ max_hdi }}">
+          <input name="rank10" type="hidden" value="{{ rank10 }}">
+          <button class="btn btn-secondary btn-block" id="export-btn"> RIS Export </button>
+        </form>          
+      </div>
     </div>
-    <div class="col-md-2 pl-5 pr-5 pt-1">
-      <form action="{% url 'zotero_export' %}" method="POST">
-        {% csrf_token %}
-        <input name="auth" type="hidden" value="{{ auth }}">
-        {% for publication in page_obj %}
-          <input name="ids[]" type="hidden" value="{{ publication.id }}">
-        {% endfor %}
-
-        <button class="btn btn-secondary btn-block"> RIS Export </button>
-      </form>          
+    <div class="row mt-1">
+        <ul class="legend col-md pl-5 pt-1">
+          {% for key, values in KEYWORDS_LIST %}
+            <li> <span class="mark{{ key }}"></span> {{ key }} </li>
+          {% endfor %}
+        </ul>
     </div>
-        <div class="row mt-1">
-            <ul class="legend col-md pl-5 pt-1">
-              {% for key, values in KEYWORDS_LIST %}
-                <li> <span class="mark{{ key }}"></span> {{ key }} </li>
-              {% endfor %}
-            </ul>
-        </div>
 
     <div class="row mt-6">
       <div class="col-md-12 pl-5 pr-5 pt-1">
@@ -326,9 +349,10 @@ ETH SPuD - {{ tak }} ; page {{ page_obj.number }}
           </ul>
         </div>
 
-        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+        <button class="btn btn-primary" id="query-btn" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
           Show Query
         </button>
+        <button onclick="topFunction()" class="btn btn-danger" id="top-btn" title="Go to top">Go to top</button>
         <br><br>
         <div class="collapse" id="collapseExample">
           <p class="b"> Query: <span class="font-weight-bold"> {{ q__q }} </span> </p>
@@ -373,12 +397,12 @@ function showAlert() {
 
     $('#alert_placeholder').append('<div id="alertdiv" class="alert alert-danger alert-dismissible fade show" role="alert"> Start year has to be smaller or equal to end year. <button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">&times;</span> </button> </div>')
 
-    setTimeout(function() { // this will automatically close the alert and remove this if the users doesnt close it in 5 secs
+    setTimeout(function() { // this will automatically close the alert and remove this if the users doesnt close it in 3 secs
 
 
       $("#alertdiv").remove();
 
-    }, 5000);
+    }, 3000);
 }
 
 function spinner() {
@@ -397,7 +421,7 @@ function validate() {
   var x = document.getElementById("yearmin").value;
   var y = document.getElementById("yearmax").value;
 
-  if (x > y) {
+  if ((x !== "") && (y !== "") && (x > y)) {
     document.getElementById("yearmin").style.borderColor = "red";
     document.getElementById("yearmax").style.borderColor = "red";
     showAlert();
@@ -405,8 +429,14 @@ function validate() {
   else {
     document.getElementById("queryForm").submit();
     spinner();
-}
+  }
 }
 
+</script>
+<script>
+function topFunction() {
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
+    }
 </script>
 {% endblock scripts %}
