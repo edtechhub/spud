@@ -28,20 +28,19 @@ def index(request):
     #start = time.time()
 
     auth = request.GET.get('auth', '')
-
-    yearmin = request.GET.get('yearmin', '').strip()
-    yearmax = request.GET.get('yearmax', '').strip()
+    yearmin = request.GET.get('ymin', '').strip()
+    yearmax = request.GET.get('ymax', '').strip()
     tak = request.GET.get('tak', '').strip()
     author = request.GET.get('author', '').strip()
-    min_hdi = request.GET.get('min_hdi', '').strip()
-    max_hdi = request.GET.get('max_hdi', '').strip()
-    form_f = request.GET.getlist('F filter')
-    form_gc_gr = request.GET.getlist('country/regions')
-    form_gd = request.GET.getlist('GD filter')
-    form_o = request.GET.getlist('O filter')
-    form_p1_p2 = request.GET.getlist('P1/P2 filter')
-    form_r = request.GET.getlist('R filter')
-    form_te_tt = request.GET.getlist('TE/TT filter')
+    min_hdi = request.GET.get('hmin', '').strip()
+    max_hdi = request.GET.get('hmax', '').strip()
+    form_f = request.GET.getlist('F')
+    form_gc_gr = request.GET.getlist('GCGR')
+    form_gd = request.GET.getlist('GD')
+    form_o = request.GET.getlist('O')
+    form_p1_p2 = request.GET.getlist('P1P2')
+    form_r = request.GET.getlist('R')
+    form_te_tt = request.GET.getlist('TETT')
     page_number = request.GET.get('page')
 
     rank10 = request.GET.get('rank10', 'off')
@@ -56,7 +55,7 @@ def index(request):
         min_hdi = 0
 
     if search_engine == 'off':
-         publications_list = Publication.objects.select_related('relevance').filter(query_function(tak, author, yearmin, yearmax, form_gc_gr, form_gd, form_p1_p2, form_te_tt, form_f, form_o, form_r, below_rank_10, min_hdi, max_hdi)).order_by('-relevance__relevance').only("id", "title", "authors", "year", "doi", "keywords", "abstract", "relevance", "importedfrom")
+         publications_list, total_matched_records = query_function(tak, author, yearmin, yearmax, form_gc_gr, form_gd, form_p1_p2, form_te_tt, form_f, form_o, form_r, below_rank_10, min_hdi, max_hdi)
     else:
         q_year = q_tak = q_with = Q()
         if year_min: q_year = Q(year=yearmin)
@@ -64,6 +63,13 @@ def index(request):
         if tak: q_tak = formulate_tak_query(tak)
 
         publications_list = Publication.objects.filter(q_year & (q_tak)).order_by('-year')
+        paginator = Paginator(publications_list, per_page)
+
+        page_obj = paginator.get_page(page_number)
+
+        q__q = connection.queries[-1]["sql"]
+
+        total_matched_records = page_obj.paginator.count
 
 
     total_records = faster_count()
@@ -73,15 +79,12 @@ def index(request):
         page_obj = publications_list.all()
         q__q = connection.queries[-1]["sql"]
 
-        total_matched_records = len(publications)
     else:
         paginator = Paginator(publications_list, per_page)
 
         page_obj = paginator.get_page(page_number)
 
         q__q = connection.queries[-1]["sql"]
-
-        total_matched_records = page_obj.paginator.count
 
     context = {
         'page_obj': page_obj,
@@ -167,14 +170,28 @@ def ris_export(request):
 @require_http_methods(["POST"])
 @authenticate_user
 def zotero_export(request):
-    auth = request.POST.get('auth', '');
+    auth = request.GET.get('auth', '')
+    yearmin = request.GET.get('ymin', '').strip()
+    yearmax = request.GET.get('ymax', '').strip()
+    tak = request.GET.get('tak', '').strip()
+    author = request.GET.get('author', '').strip()
+    min_hdi = request.GET.get('hmin', '').strip()
+    max_hdi = request.GET.get('hmax', '').strip()
+    form_f = request.GET.getlist('F')
+    form_gc_gr = request.GET.getlist('GCGR')
+    form_gd = request.GET.getlist('GD')
+    form_o = request.GET.getlist('O')
+    form_p1_p2 = request.GET.getlist('P1/P2')
+    form_r = request.GET.getlist('R')
+    form_te_tt = request.GET.getlist('TE/TT')
+    below_rank_10 = True if rank10 == "off" else False
+    
+    publications = Publication.objects.select_related('relevance').filter(query_function(tak, author, year, form_gc_gr, form_gd, form_p1_p2, form_te_tt, form_f, form_o, form_r, below_rank_10, min_hdi, max_hdi)).order_by('-relevance__relevance').defer('tsv', 'tsa', 'tak')
 
-    publication_ids = request.POST.getlist('ids[]')
-    publications = Publication.objects.filter(id__in=publication_ids)
 
-    zotero_content = "\n\n".join([publication.ris_format() for publication in publications])
+    zotero_content = ((publication.ris_format() + "\n\n") for publication in publications)
 
-    response = HttpResponse(zotero_content, content_type="application/x-research-info-systems")
+    response = StreamingHttpResponse(zotero_content, content_type="application/x-research-info-systems")
     response['Content-Disposition'] = 'attachment; filename="SPUD_RIS_EXPORT.ris"'
 
     return response

@@ -5,61 +5,57 @@ body {
 .navbar {
 	padding: 0.1rem 1rem !important;
 	font-size: 16px !important;
+	z-index: 999 !important;
 }
 
 .markCountries {
-	background: yellow;
+	background: #F8FD89;
 	color: black;
 }
 
 .markRegions {
-	background: purple;
-	color: white;
+	background: #B987DC;
+	color: black;
 }
 
 .markDevelopmentTerms {
-	background: #326791;
-	color: white;
-}
-
-.markSearchTerms {
-	background: green;
-	color: white;
+	background: #96ADFC;
+	color: black;
 }
 
 .markTechTerms {
-	background: #9B2335;
-	color: white;
+	background: #E0A6AA;
+	color: black;
 }
 
 .markEducationalTerms {
-	background: #EFC050;
-	color: white;
+	background: #EDDD6E;
+	color: black;
 }
 
 .markPopulation1 {
-	background: #DD4124;
-	color: white;
+	background: #EDD1B0;
+	color: black;
 }
 
 .markPopulation2 {
-	background: #009B77;
-	color: white;
+	background: #A5F7E1;
+	color: black;
 }
 
 .markOrganizations {
-	background: #955251;
-	color: white;
+	background: #D8D3D6;
+	color: black;
 }
 
 .markFocus {
-	background: #C3447A;
-	color: white;
+	background: #DBE1F1;
+	color: black;
 }
 
 .markResearch {
-	background: #88B04B;
-	color: white;
+	background: #A8F29A;
+	color: black;
 }
 
 .wrap {
@@ -99,7 +95,9 @@ body {
 }
 
 hr.form {
-  border-top: 4px solid black;
+	border-top: 4px solid black;
+	width: 98%;
+	margin-left: 20px;
 }
 
 .legend { list-style: none; }
@@ -107,7 +105,7 @@ hr.form {
 .legend span { border: 1px solid #ccc; float: left; width: 20px; height: 20px; margin: 2px; }
 
 .footer {
-  position: absolute;
+  position: static;
   display: flex;
   justify-content: space-evenly;
   width: 100%;
