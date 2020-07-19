@@ -9,21 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- This changelog file.
 - Searching by minimum year and maximum year functionality.
-- Added a footer with version and copyright.
-- Jump to top button.
 
 ### Changed
 
 - New colours for the highlighting.
 - All highlighted text is now black.
 
-## [1.0.b] - 2020-07-20
+## [1.0.b] - 2020-07-19
 
 ### Added
 
 - Live timer for search queries.
+- Jump to top button.
+- This changelog file.
+- Footer displaying version and copyright.
 
 ### Changed
 
