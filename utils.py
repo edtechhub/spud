@@ -1,7 +1,6 @@
 from django.db.models import Q
 from django.db import connection
 from django.contrib.postgres.search import SearchQuery
-from publications.models import Publication
 
 import re
 
@@ -1233,11 +1232,10 @@ def query_function(tak=None, author=None, yearmin=None, yearmax=None, form_gc_gr
         large_filter &= Q(r_query)
 
     if large_filter == Q():
-        return Publication.objects.none(), 0
+        return large_filter
     if below_rank_10 == True:
         large_filter &= Q(relevance__relevance__gt=10)
-    last_query = Publication.objects.select_related('relevance').filter(large_filter).order_by('-relevance__relevance').only("id", "title", "authors", "year", "doi", "keywords", "abstract", "relevance", "importedfrom")
-    return last_query, last_query.count
+    return large_filter
 
 def formulate_tak_query(query_string):
 	query_parts = Q()

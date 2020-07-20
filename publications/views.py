@@ -55,7 +55,13 @@ def index(request):
         min_hdi = 0
 
     if search_engine == 'off':
-         publications_list, total_matched_records = query_function(tak, author, yearmin, yearmax, form_gc_gr, form_gd, form_p1_p2, form_te_tt, form_f, form_o, form_r, below_rank_10, min_hdi, max_hdi)
+        myquery = query_function(tak, author, yearmin, yearmax, form_gc_gr, form_gd, form_p1_p2, form_te_tt, form_f, form_o, form_r, below_rank_10, min_hdi, max_hdi)
+        if myquery == Q():
+            publications_list = Publication.objects.none()
+            total_matched_records = 0
+        else:
+            publications_list = Publication.objects.select_related('relevance').filter(myquery).order_by('-relevance__relevance').only("id", "title", "authors", "year", "doi", "keywords", "abstract", "relevance", "importedfrom")
+            total_matched_records = len(publications_list)
     else:
         q_year = q_tak = q_with = Q()
         if year_min: q_year = Q(year=yearmin)
@@ -170,24 +176,24 @@ def ris_export(request):
 @require_http_methods(["POST"])
 @authenticate_user
 def zotero_export(request):
-    auth = request.GET.get('auth', '')
-    yearmin = request.GET.get('ymin', '').strip()
-    yearmax = request.GET.get('ymax', '').strip()
-    tak = request.GET.get('tak', '').strip()
-    author = request.GET.get('author', '').strip()
-    min_hdi = request.GET.get('hmin', '').strip()
-    max_hdi = request.GET.get('hmax', '').strip()
-    form_f = request.GET.getlist('F')
-    form_gc_gr = request.GET.getlist('GCGR')
-    form_gd = request.GET.getlist('GD')
-    form_o = request.GET.getlist('O')
-    form_p1_p2 = request.GET.getlist('P1/P2')
-    form_r = request.GET.getlist('R')
-    form_te_tt = request.GET.getlist('TE/TT')
+    auth = request.POST.get('auth', '')
+    yearmin = request.POST.get('ymin', '').strip()
+    yearmax = request.POST.get('ymax', '').strip()
+    tak = request.POST.get('tak', '').strip()
+    author = request.POST.get('author', '').strip()
+    min_hdi = request.POST.get('hmin', '').strip()
+    max_hdi = request.POST.get('hmax', '').strip()
+    form_f = request.POST.getlist('f')
+    form_gc_gr = request.POST.getlist('gc/gr')
+    form_gd = request.POST.getlist('gd')
+    form_o = request.POST.getlist('o')
+    form_p1_p2 = request.POST.getlist('p1/p2')
+    form_r = request.POST.getlist('r')
+    form_te_tt = request.POST.getlist('te/tt')
+    rank10 = request.POST.get('rank10', 'off')
     below_rank_10 = True if rank10 == "off" else False
     
-    publications = Publication.objects.select_related('relevance').filter(query_function(tak, author, year, form_gc_gr, form_gd, form_p1_p2, form_te_tt, form_f, form_o, form_r, below_rank_10, min_hdi, max_hdi)).order_by('-relevance__relevance').defer('tsv', 'tsa', 'tak')
-
+    publications = Publication.objects.select_related('relevance').filter(query_function(tak, author, yearmin, yearmax, form_gc_gr, form_gd, form_p1_p2, form_te_tt, form_f, form_o, form_r, below_rank_10, min_hdi, max_hdi)).order_by('-relevance__relevance').only("id", "title", "authors", "year", "doi", "keywords", "abstract", "relevance", "importedfrom")
 
     zotero_content = ((publication.ris_format() + "\n\n") for publication in publications)
 
