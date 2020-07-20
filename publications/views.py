@@ -152,14 +152,6 @@ def showrecord(request):
 
     return render(request, 'publications/showrecord.html', context)
 
-@authenticate_user
-def changelog(request):
-    auth = request.GET.get('auth', '')
-    context = {
-        'auth': settings.AUTH_KEY,
-    }
-    return render(request, 'publications/changelog.html', context)
-
 @require_http_methods(["POST"])
 @authenticate_user
 def ris_export(request):
@@ -195,9 +187,9 @@ def zotero_export(request):
     
     publications = Publication.objects.select_related('relevance').filter(query_function(tak, author, yearmin, yearmax, form_gc_gr, form_gd, form_p1_p2, form_te_tt, form_f, form_o, form_r, below_rank_10, min_hdi, max_hdi)).order_by('-relevance__relevance').only("id", "title", "authors", "year", "doi", "keywords", "abstract", "relevance", "importedfrom")
 
-    zotero_content = ((publication.ris_format() + "\n\n") for publication in publications)
+    zotero_content = [(publication.ris_format() + "\n\n") for publication in publications]
 
-    response = StreamingHttpResponse(zotero_content, content_type="application/x-research-info-systems")
+    response = HttpResponse(zotero_content, content_type="application/x-research-info-systems")
     response['Content-Disposition'] = 'attachment; filename="SPUD_RIS_EXPORT.ris"'
 
     return response
