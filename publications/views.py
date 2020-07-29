@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, JsonResponse
+from django.http import StreamingHttpResponse, HttpResponse, JsonResponse
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.db import connection
@@ -8,9 +8,20 @@ from django.views.decorators.http import require_http_methods
 from django.contrib.postgres.search import SearchQuery
 
 from django.conf import settings
-from utils import *
+from utils import formulate_tak_query, query_function, faster_count
 import time
 
+def chunked_iterator(queryset, chunk_size=1000):
+    paginator = Paginator(queryset, chunk_size)
+    for page in range(1, paginator.num_pages + 1):
+        for obj in paginator.page(page).object_list:
+            yield obj.ris_format() + "\n\n"
+
+
+def exporting_generator(applied_filters):
+    data = Publication.objects.filter(relevance__relevance__gt=10).filter(applied_filters).order_by('year').only("title", "authors", "author100","containername", "publicationtype", "abstract", "year", "doi", "isbn", "location", "daterange", "links", "citation", "identifier", "recordmetadata_zbuamajorversion", "recordmetadata_dateretrieved", "recordmetadata_dateconverted", "recordmetadata_recordtype", "recordmetadata_source", "recordmetadata_recordname", "recordmetadata_searchguid", "recordmetadata_numberinsource", "recordmetadata_zbuaminorversion", "id", "itemdatatype", "itemdatahandler", "created_at", "importedfrom")
+    for value in data.iterator(chunk_size=1000):
+         yield value.ris_format() + "\n\n"
 
 
 def authenticate_user(function):
@@ -25,7 +36,7 @@ def authenticate_user(function):
 @require_http_methods(["GET"])
 @authenticate_user
 def index(request):
-    #start = time.time()
+    start = time.time()
 
     auth = request.GET.get('auth', '')
     yearmin = request.GET.get('ymin', '').strip()
@@ -45,8 +56,8 @@ def index(request):
 
     rank10 = request.GET.get('rank10', 'off')
     below_rank_10 = True if rank10 == "off" else False
-    search_engine = request.GET.get('search-engine', 'off')
-    highlight = request.GET.get('highlight', 'off')
+    search_engine = request.GET.get('search', 'off')
+    highlight = request.GET.get('hlight', 'off')
     highlight_keywords = True if highlight == "off" else False
 
     if min_hdi and not max_hdi:
@@ -58,25 +69,15 @@ def index(request):
         myquery = query_function(tak, author, yearmin, yearmax, form_gc_gr, form_gd, form_p1_p2, form_te_tt, form_f, form_o, form_r, below_rank_10, min_hdi, max_hdi)
         if myquery == Q():
             publications_list = Publication.objects.none()
-            total_matched_records = 0
         else:
             publications_list = Publication.objects.select_related('relevance').filter(myquery).order_by('-relevance__relevance').only("id", "title", "authors", "year", "doi", "keywords", "abstract", "relevance", "importedfrom")
-            total_matched_records = len(publications_list)
     else:
         q_year = q_tak = q_with = Q()
-        if year_min: q_year = Q(year=yearmin)
+        if yearmin: q_year = Q(year=yearmin)
 
         if tak: q_tak = formulate_tak_query(tak)
 
         publications_list = Publication.objects.filter(q_year & (q_tak)).order_by('-year')
-        paginator = Paginator(publications_list, per_page)
-
-        page_obj = paginator.get_page(page_number)
-
-        q__q = connection.queries[-1]["sql"]
-
-        total_matched_records = page_obj.paginator.count
-
 
     total_records = faster_count()
 
@@ -84,6 +85,7 @@ def index(request):
     if int(per_page) == 0:
         page_obj = publications_list.all()
         q__q = connection.queries[-1]["sql"]
+        total_matched_records = len(publications_list)
 
     else:
         paginator = Paginator(publications_list, per_page)
@@ -91,6 +93,7 @@ def index(request):
         page_obj = paginator.get_page(page_number)
 
         q__q = connection.queries[-1]["sql"]
+        total_matched_records = page_obj.paginator.count
 
     context = {
         'page_obj': page_obj,
@@ -127,7 +130,7 @@ def index(request):
 
         'auth': settings.AUTH_KEY,
         'q__q': q__q,
-        #'timer': str(round(time.time() - start, 2)),
+        'timer': str(round(time.time() - start, 2)),
 
     }
     return render(request, 'publications/index.html', context)
@@ -140,7 +143,7 @@ def showrecord(request):
     publication_id = request.GET.get('id')
     publication = Publication.objects.filter(id=publication_id).first()
 
-    highlight = request.GET.get('highlight', 'off')
+    highlight = request.GET.get('hlight', 'off')
     highlight_keywords = True if highlight == "off" else False
 
     context = {
@@ -155,7 +158,7 @@ def showrecord(request):
 @require_http_methods(["POST"])
 @authenticate_user
 def ris_export(request):
-    auth = request.POST.get('auth', '');
+    auth = request.POST.get('auth', '')
 
     publication_id = request.POST.get('id')
     publication = Publication.objects.filter(id=publication_id).first()
@@ -183,13 +186,12 @@ def zotero_export(request):
     form_r = request.POST.getlist('r')
     form_te_tt = request.POST.getlist('te/tt')
     rank10 = request.POST.get('rank10', 'off')
-    below_rank_10 = True if rank10 == "off" else False
+    #below_rank_10 = True if rank10 == "off" else False
     
-    publications = Publication.objects.select_related('relevance').filter(query_function(tak, author, yearmin, yearmax, form_gc_gr, form_gd, form_p1_p2, form_te_tt, form_f, form_o, form_r, below_rank_10, min_hdi, max_hdi)).order_by('-relevance__relevance').only("id", "title", "authors", "year", "doi", "keywords", "abstract", "relevance", "importedfrom")
+    #zotero_content = chunked_iterator(Publication.objects.filter(relevance__relevance__gt=10).filter(query_function(tak, author, yearmin, yearmax, form_gc_gr, form_gd, form_p1_p2, form_te_tt, form_f, form_o, form_r, False, min_hdi, max_hdi)).only("title", "authors", "author100","containername", "publicationtype", "abstract", "year", "doi", "isbn", "location", "daterange", "links", "citation", "identifier", "recordmetadata_zbuamajorversion", "recordmetadata_dateretrieved", "recordmetadata_dateconverted", "recordmetadata_recordtype", "recordmetadata_source", "recordmetadata_recordname", "recordmetadata_searchguid", "recordmetadata_numberinsource", "recordmetadata_zbuaminorversion", "id", "itemdatatype", "itemdatahandler", "created_at", "importedfrom"))
+    zotero_content = exporting_generator(query_function(tak, author, yearmin, yearmax, form_gc_gr, form_gd, form_p1_p2, form_te_tt, form_f, form_o, form_r, False, min_hdi, max_hdi))
 
-    zotero_content = [(publication.ris_format() + "\n\n") for publication in publications]
-
-    response = HttpResponse(zotero_content, content_type="application/x-research-info-systems")
+    response = StreamingHttpResponse(zotero_content, content_type="application/x-research-info-systems")
     response['Content-Disposition'] = 'attachment; filename="SPUD_RIS_EXPORT.ris"'
 
     return response
@@ -197,6 +199,6 @@ def zotero_export(request):
 @require_http_methods(["GET"])
 @authenticate_user
 def keywords(request):
-    auth = request.GET.get('auth', '');
+    auth = request.GET.get('auth', '')
 
     return JsonResponse({'countries': settings.COUNTRIES, 'regions': settings.REGIONS, 'development_terms': settings.DEVELOPMENT_TERMS})

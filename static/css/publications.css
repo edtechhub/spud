@@ -104,12 +104,12 @@ hr.form {
 .legend li { float: left; margin-right: 10px; }
 .legend span { border: 1px solid #ccc; float: left; width: 20px; height: 20px; margin: 2px; }
 
-.footer {
-  position: static;
+#copyright-version {
+  position: absolute;
   display: flex;
   justify-content: space-evenly;
   width: 100%;
-  color: white;
+  color: white !important;
   height:70px;
 }
 
@@ -121,7 +121,15 @@ hr.form {
 	top: 60%;
 }
 
-.alerts {
-    position:fixed;
+#info-message {
+	font-size: 25px;
+	position: fixed;
+	left: 39%;
+}
+
+#alertdiv {
+	top: 0%;
+	width: 100%;
+    position:absolute;
     z-index: 1000 !important;
 }

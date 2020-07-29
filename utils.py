@@ -1168,7 +1168,7 @@ def check_hdi(bottom_value, top_value, value_index, country):
         return True
 
 
-def query_function(tak=None, author=None, yearmin=None, yearmax=None, form_gc_gr=None, form_gd=None, form_p1_p2=None, form_te_tt=None, form_f=None, form_o=None, form_r=None, below_rank_10=True, min_hdi=None, max_hdi=None):
+def query_function(tak=None, author=None, yearmin=None, yearmax=None, form_gc_gr=None, form_gd=None, form_p1_p2=None, form_te_tt=None, form_f=None, form_o=None, form_r=None, below_rank_10=False, min_hdi=None, max_hdi=None):
     large_filter = Q()
     if tak:
         tak_query = SearchQuery(tak, search_type='websearch')
@@ -1183,22 +1183,14 @@ def query_function(tak=None, author=None, yearmin=None, yearmax=None, form_gc_gr
     if form_gc_gr and form_gd:
         g_query = Q()
         for gc_gr_value in form_gc_gr:
-            if min_hdi and max_hdi:
-                if check_hdi(min_hdi, max_hdi, hdi_values, gc_gr_value) == True:
-                    g_query = explain_character_with_dict_existence(gc_gr_value, g_query)
-            else:
-                form_gc_query = explain_character_with_dict_existence(gc_gr_value, g_query)
+            g_query = explain_character_with_dict_existence(gc_gr_value, g_query)
         for gd_value in form_gd:
             g_query = explain_character_with_dict_existence(gd_value, g_query) 
         large_filter &= Q(g_query)
     if form_gc_gr and not form_gd:
         g_query = Q()
         for gc_gr_value in form_gc_gr:
-            if min_hdi and max_hdi:
-                if check_hdi(min_hdi, max_hdi, hdi_values, gc_gr_value) == True:
-                    g_query = explain_character_with_dict_existence(gc_gr_value, g_query)
-            else:
-                g_query = explain_character_with_dict_existence(gc_gr_value, g_query)
+            g_query = explain_character_with_dict_existence(gc_gr_value, g_query)
         large_filter &= Q(g_query)
     if form_gd and not form_gc_gr:
         g_query = Q()

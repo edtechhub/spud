@@ -16,6 +16,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - New colours for the highlighting.
 - All highlighted text is now black.
 
+## [1.0.c] - 2020-07-23
+
+### Changed
+
+- RIS export now supports files larger than 5000 results
+
 ## [1.0.b] - 2020-07-19
 
 ### Added
