@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] - 2020-07-(date to change)
+## [Unreleased] - 2020-07-27
 
 ### Added
 
@@ -15,12 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - New colours for the highlighting.
 - All highlighted text is now black.
-
-## [1.0.c] - 2020-07-23
-
-### Changed
-
-- RIS export now supports files larger than 5000 results
+- HDI filter hidden until new functionality is done.
 
 ## [1.0.b] - 2020-07-19
 
