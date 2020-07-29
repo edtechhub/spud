@@ -5,16 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] - 2020-07-(date to change)
+## [1.1.0] - 2020-07-27
 
 ### Added
 
 - Searching by minimum year and maximum year functionality.
+- Google analytics tracking code.
+- Google cloud profiler for tracking CPU usage in processes.
+
 
 ### Changed
 
 - New colours for the highlighting.
 - All highlighted text is now black.
+- HDI filter hidden until new functionality is done.
+- Old search type fixed
 
 ## [1.0.b] - 2020-07-19
 
