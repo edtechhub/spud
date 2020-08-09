@@ -57,6 +57,7 @@ def index(request):
     rank10 = request.GET.get('rank10', 'off')
     below_rank_10 = True if rank10 == "off" else False
     search_engine = request.GET.get('search', 'off')
+    search_engine_var = True if search_engine == "off" else False
     highlight = request.GET.get('hlight', 'off')
     highlight_keywords = True if highlight == "off" else False
 
@@ -104,6 +105,7 @@ def index(request):
         'tak': tak,
         'author': author,
         'limit': per_page,
+        'search_engine_var': search_engine_var,
         'min_hdi': min_hdi,
         'max_hdi': max_hdi,
 
