@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Fixed filtering by year on RIS export.
+- Search engine checkbox stays ticked.
 
 ## [1.1.0] - 2020-07-27
 
