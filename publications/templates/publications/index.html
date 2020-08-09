@@ -8,9 +8,6 @@
 <title>
 ETH SPuD - {{ tak }} ; page {{ page_obj.number }}
 
-{% if year %}
-  ; {{ year }}
-{% endif %}
 </title>
 
 
@@ -209,7 +206,8 @@ ETH SPuD - {{ tak }} ; page {{ page_obj.number }}
           {% csrf_token %}
           <input name="auth" type="hidden" value="{{ auth }}">
           <input name="tak" type="hidden" value="{{ tak }}">
-          <input name="year" type="hidden" value="{{ year }}">
+          <input name="ymin" type="hidden" value="{{ ymin }}">
+          <input name="ymax" type="hidden" value="{{ ymax }}">
           <input name="author" type="hidden" value="{{ author }}">
           {% for values in form_gc_gr %}
             <input name="gc/gr" type="hidden" value="{{ values }}">
