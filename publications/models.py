@@ -19,7 +19,7 @@ class Publication(models.Model):
 	importedfrom = models.TextField()
 	containername = models.TextField()
 	doi = models.TextField()
-
+	semantic_values = models.TextField()
 	tsv = SearchVectorField(null=True, editable=False)
 	tsa = SearchVectorField(null=True, editable=False)
 
