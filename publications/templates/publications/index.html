@@ -34,7 +34,7 @@ ETH SPuD - {{ tak }} ; page {{ page_obj.number }}
     <div class="form-row pl-4 pr-4">
 
       <div class="col-md-6">
-        <input type="text" class="form-control" name="tak" value="{{ tak }}" placeholder="query (searches words and basic variations)">
+        <input type="text" class="form-control" id="queryInput" name="tak" value="{{ tak }}" placeholder="query (searches words and basic variations)">
       </div>
       <div class="col-md-1 ">
         <input type="number" step="1" min="1900" max="2020" class="form-control" id="yearmin" name="ymin" value="{{ yearmin }}" placeholder="year min..">
@@ -252,6 +252,7 @@ ETH SPuD - {{ tak }} ; page {{ page_obj.number }}
           {% for key, values in KEYWORDS_LIST %}
             <li> <span class="mark{{ key }}"></span> {{ key }} </li>
           {% endfor %}
+          <li> <span class="markSearch"></span> Search Query </li>
         </ul>
     </div>
 
@@ -267,12 +268,12 @@ ETH SPuD - {{ tak }} ; page {{ page_obj.number }}
               flex: 0 0 4%;max-width: 4%;"> Year </th>
               <th class="col-1" style="width: 10%;
               flex: 0 0 10%;max-width: 10%;"> Title </th>
-              <th class="col-1" style="width: 48%;
-              flex: 0 0 48%;max-width: 48%;"> Abstract </th>
-              <th class="col-1" style="width: 10%;
-              flex: 0 0 10%;max-width: 10%;"> Keywords </th>
-              <th class="col-1" style="width: 10%;
-              flex: 0 0 10%;max-width: 10%;"> Semantic Values </th>
+              <th class="col-1" style="width: 38%;
+              flex: 0 0 38%;max-width: 38%;"> Abstract </th>
+              <th class="col-1" style="width: 15%;
+              flex: 0 0 15%;max-width: 15%;"> Keywords </th>
+              <th class="col-1" style="width: 15%;
+              flex: 0 0 15%;max-width: 15%;"> Semantic Values </th>
               <th class="col-1" style="width: 4%;
               flex: 0 0 4%;max-width: 4%;"> Links </th>
               <th class="col-1" style="width: 4%;
@@ -296,24 +297,24 @@ ETH SPuD - {{ tak }} ; page {{ page_obj.number }}
                   {% endif %}
                 </a>
               </td>
-              <td class="col-1 highlighter wrap addReadMore showlesscontent" wordsLmt="{{ ABSTRACT_WORDS_LIMIT }}"  style="width: 48%;
-              flex: 0 0 48%;max-width: 48%;">
+              <td class="col-1 highlighter wrap addReadMore showlesscontent" wordsLmt="{{ ABSTRACT_WORDS_LIMIT }}"  style="width: 38%;
+              flex: 0 0 38%;max-width: 38%;">
                 {% if highlight_keywords %}
                   {{ publication.abstract|check_availablity|replace_highlighted }}
                 {% else %}
                   {{ publication.abstract|check_availablity }}
                 {% endif %}
               </td>
-              <td class="col-1 highlighter wrap"  style="width: 10%;
-              flex: 0 0 10%;max-width: 10%;">
+              <td class="col-1 highlighter wrap"  style="width: 15%;
+              flex: 0 0 15%;max-width: 15%;">
                 {% if highlight_keywords %}
                   {{ publication.keywords|check_availablity|replace_highlighted }}
                 {% else %}
                   {{ publication.keywords|check_availablity }}
                 {% endif %}
               </td>
-              <td class="col-1 highlighter wrap"  style="width: 10%;
-              flex: 0 0 10%;max-width: 10%;">
+              <td class="col-1 highlighter wrap"  style="width: 15%;
+              flex: 0 0 15%;max-width: 15%;">
                 {{ publication.semantic_values|check_availablity|make_links }}
               </td>
               <td class="col-1 highlighter wrap" style="width: 4%;
@@ -328,7 +329,7 @@ ETH SPuD - {{ tak }} ; page {{ page_obj.number }}
                 </a>
               </td>
               <td class="col-1" style="width: 4%;
-              flex: 0 0 4%;max-width: 4%;"> {{ publication.relevance.relevance }} </td>
+              flex: 0 0 4%;max-width: 4%;"> {{ publication.relevance.relevance_normalised }} </td>
             </tr>
           {% endfor %}
 
@@ -718,5 +719,11 @@ function topFunction() {
         control.addItem(hdiName);
     }
   }
+</script>
+<script>
+$(function() {
+  var words = document.getElementById("queryInput").value;
+  $(".highlighter").mark(words);
+})
 </script>
 {% endblock scripts %}

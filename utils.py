@@ -211,7 +211,7 @@ search_filter = {
     "fx":Q(gc__vanuatu__gt=0),
     "fy":Q(gc__vaticancity__gt=0),
     "fz":Q(gc__venezuela__gt=0),
-    "f0":(Q(gc__vietnam2__gt=0) | Q(gc__vietnam1__gt=0)),
+    "f0":Q(gc__vietnam__gt=0),
     "f1":Q(gc__yemen__gt=0),
     "f2":Q(gc__zambia__gt=0),
     "f3":Q(gc__zimbabwe__gt=0),

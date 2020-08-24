@@ -529,8 +529,7 @@ class Gc(models.Model):
     vanuatu = models.SmallIntegerField(blank=True, null=True)
     vaticancity = models.SmallIntegerField(blank=True, null=True)
     venezuela = models.SmallIntegerField(blank=True, null=True)
-    vietnam2 = models.SmallIntegerField(blank=True, null=True)
-    vietnam1 = models.SmallIntegerField(blank=True, null=True)
+    vietnam = models.SmallIntegerField(blank=True, null=True)
     yemen = models.SmallIntegerField(blank=True, null=True)
     zambia = models.SmallIntegerField(blank=True, null=True)
     zimbabwe = models.SmallIntegerField(blank=True, null=True)
@@ -1178,6 +1177,7 @@ class Relevance(models.Model):
     t = models.SmallIntegerField(blank=True, null=True)
     x = models.SmallIntegerField(blank=True, null=True)
     relevance = models.SmallIntegerField(blank=True, null=True)
+    relevance_normalised = models.DecimalField(max_digits=6, decimal_places=4, blank=True, null=True)
 
     class Meta:
         managed = False

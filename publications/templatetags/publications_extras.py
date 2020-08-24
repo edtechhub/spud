@@ -21,5 +21,5 @@ def make_links(value):
 	text = ""
 	for i in value:
 		if i != "":
-			text += "<a href='/detail/" + i.strip() + "/?auth=ffffff' target='_blank'>" + i + "</a>, "
+			text += "<a href='/detail/" + i.strip() + "/?auth=45728b6c-4227-11ea-905d-4bc10b2df14f' target='_blank'>" + i + "</a>; "
 	return mark_safe(text)

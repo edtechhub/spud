@@ -58,11 +58,10 @@ body {
 	color: black;
 }
 
-.markSearchResults {
-	background: #ffffff;
+.markSearch {
+	background: #fcf8e3;
 	color: black;
 }
-
 
 .wrap {
 	word-wrap:break-word;

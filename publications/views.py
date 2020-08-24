@@ -58,7 +58,7 @@ def index(request):
         if myquery == Q():
             publications_list = Publication.objects.none()
         else:
-            publications_list = Publication.objects.select_related('relevance').filter(myquery).order_by('-relevance__relevance').only("id", "title", "authors", "year", "doi", "keywords", "abstract", "relevance", "importedfrom")
+            publications_list = Publication.objects.select_related('relevance').filter(myquery).order_by('-relevance__relevance_normalised').defer("tsa", "tsv")
     else:
         q_year = q_tak = q_with = Q()
         if yearmin: q_year = Q(year=yearmin)
@@ -1346,12 +1346,10 @@ def detail(request, word):
         "Bolivarian Republic of Venezuelan",
         "Bolivarian Republic of Venezuelans"
     ],
-    "vietnam2": [
+    "vietnam": [
         "Viet Nam",
         "Viet Nams",
-        "Viet Namn"
-    ],
-    "vietnam1": [
+        "Viet Namn",
         "Vietnam",
         "Vietnamese",
         "Kinh"

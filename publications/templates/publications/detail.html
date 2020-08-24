@@ -8,9 +8,11 @@
 {% block content %}
 <div>
     <h1 id="h1Semantic"><p> {{ semantic_value }} </p></h1>
-    {% for value in semantic_lexemes %}
-        <p id="pSemantic"> {{ value }} </p>
-    {% endfor %}
+        <ul>
+            {% for value in semantic_lexemes %}
+                <li id="pSemantic"> {{ value }} </li>
+            {% endfor %}
+        </ul>
 </div>
 {% endblock content %}
 {% block scripts %}

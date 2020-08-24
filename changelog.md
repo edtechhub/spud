@@ -11,10 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Semantic value added representing keywords contained in tak.
 - HDI filters functionality for sorting GC filters.
+- Highlighting for user searches.
 
 ### Changed
 
 - Visual changes to UI displayed
+- Resized displayed tables
 
 ## [1.1.b] - 2020-08-09
 
