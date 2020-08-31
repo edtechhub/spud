@@ -76,12 +76,13 @@ ETH SPuD - {{ tak }} ; page {{ page_obj.number }}
           <label for="max-hdi"><strong>Max-HDI:</strong></label>
           <input type="number" id="hdimax" step="0.01" min="0" max="1" class="form-control" name="hmax" value="{{ max_hdi }}" placeholder="Max-HDI.." title="Press << ADD to populate Country / Regions list, value must be between 0 - 1">
         </div>
+        <!-- selection of groups of countries!
         <div class="col-md-4 text-left">
           <label for="group-countries"><strong>Select Groups of Countries:</strong></label>
           <select id="group-countries" class="form-control" name="group-countries">
             <option value="test">Test</option>
           </select>
-        </div>
+        </div> -->
       </div>
     </div>
     
@@ -287,7 +288,7 @@ ETH SPuD - {{ tak }} ; page {{ page_obj.number }}
               flex: 0 0 10%;max-width: 10%;"> {{ publication.authors|check_availablity }} </td>
               <td class="col-1" style="width: 4%;
               flex: 0 0 4%;max-width: 4%;"> {{ publication.year }} </td>
-              <td class="col-1" style="width: 10%;
+              <td class="col-1 highlighter" style="width: 10%;
               flex: 0 0 10%;max-width: 10%;">
                 <a href="{% url 'showrecord'%}?auth={{ auth }}&importedfrom={{ publication.get_persisted_id | urlencode }}&id={{ publication.id }}&highlight={{ highlight_param }}" target="_blank">
                   {% if highlight_keywords %}
@@ -313,11 +314,11 @@ ETH SPuD - {{ tak }} ; page {{ page_obj.number }}
                   {{ publication.keywords|check_availablity }}
                 {% endif %}
               </td>
-              <td class="col-1 highlighter wrap"  style="width: 15%;
+              <td class="col-1 wrap"  style="width: 15%;
               flex: 0 0 15%;max-width: 15%;">
                 {{ publication.semantic_values|check_availablity|make_links }}
               </td>
-              <td class="col-1 highlighter wrap" style="width: 4%;
+              <td class="col-1 wrap" style="width: 4%;
               flex: 0 0 4%;max-width: 4%;">
                 {% if publication.doi %}
                   <a href="https://doi.org/{{ publication.doi }}" target="_blank"> {{ publication.doi }} </a>
@@ -722,7 +723,7 @@ function topFunction() {
 </script>
 <script>
 $(function() {
-  var words = document.getElementById("queryInput").value;
+  var words = document.getElementById("queryInput").value.toLowerCase().replace(/ or/g,"").replace(/ and/g,"").replace(/"/g,'');
   $(".highlighter").mark(words);
 })
 </script>
