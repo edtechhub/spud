@@ -1,0 +1,21 @@
+{% extends "publications/base.html" %}
+{% load publications_extras %}
+{% load highlighter %}
+{% load static %}
+{% block head %}
+<title>ETH SPuD - {{ semantic_value }}</title>
+{% endblock head %}
+{% block content %}
+<div>
+    <h1 id="h1Semantic"><p> {{ semantic_value }} </p></h1>
+        <ul>
+            {% for value in semantic_lexemes %}
+                <li id="pSemantic"> {{ value }} </li>
+            {% endfor %}
+        </ul>
+</div>
+{% endblock content %}
+{% block scripts %}
+    <script src="{% static 'js/jquery-3.4.1.slim.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+{% endblock scripts %}

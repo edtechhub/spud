@@ -7,10 +7,6 @@
 {% block head %}
 <title>
 ETH SPuD - {{ tak }} ; page {{ page_obj.number }}
-
-{% if year %}
-  ; {{ year }}
-{% endif %}
 </title>
 
 
@@ -32,13 +28,13 @@ ETH SPuD - {{ tak }} ; page {{ page_obj.number }}
 <div id = "alert_placeholder"></div>
 <div id="wrapper">
   <main role="main" class="container-fluid" style="margin-top: 50px;">
-    <form id="queryForm" class="needs-validation" action="{% url 'index' %}" method="GET" class="mb-3" onsubmit="event.preventDefault(); validate();" validate>
+    <form id="queryForm" class="needs-validation" action="{% url 'index' %}" method="GET" class="mb-3" onsubmit="event.preventDefault(); validateYear();" validate>
       <input name="limit" type="hidden" value="{{ limit }}">
       <input name="auth" type="hidden" value="{{ auth }}"> 
     <div class="form-row pl-4 pr-4">
 
       <div class="col-md-6">
-        <input type="text" class="form-control" name="tak" value="{{ tak }}" placeholder="query (searches words and basic variations)">
+        <input type="text" class="form-control" id="queryInput" name="tak" value="{{ tak }}" placeholder="query (searches words and basic variations)">
       </div>
       <div class="col-md-1 ">
         <input type="number" step="1" min="1900" max="2020" class="form-control" id="yearmin" name="ymin" value="{{ yearmin }}" placeholder="year min..">
@@ -68,16 +64,28 @@ ETH SPuD - {{ tak }} ; page {{ page_obj.number }}
           {% endfor %}
         </select> 
       </div>
-      <div class="col-md-1 text-left" style="visibility: hidden;">
-        <label for="min-hdi"><strong>Min-HDI:</strong></label>
-        <input type="number" id="hdimin" step="0.01" min="0" max="1" class="form-control" name="hmin" value="{{ min_hdi }}" placeholder="Min-HDI.." title="Value must be between 0 - 1">
-      </div>
-      <div class="col-md-1 text-left" style="visibility: hidden;">
-        <label for="max-hdi"><strong>Max-HDI:</strong></label>
-        <input type="number" id="hdimax" step="0.01" min="0" max="1" class="form-control" name="hmax" value="{{ max_hdi }}" placeholder="Max-HDI.." title="Value must be between 0 - 1">
+      <div id="divHdi" class="row col pl-4 pr-4">
+        <div class="col-md-2 text-left">
+          <button onclick="event.preventDefault(); validateHdi();" type="button" class="btn btn-secondary" id="btn-hdi"> << ADD </button>
+        </div>
+        <div class="col-md-2 text-left">
+          <label for="min-hdi"><strong>Min-HDI:</strong></label>
+          <input type="number" id="hdimin" step="0.01" min="0" max="1" class="form-control" name="hmin" value="{{ min_hdi }}" placeholder="Min-HDI.." title="Press << ADD to populate Country / Regions list, value must be between 0 - 1">
+        </div>
+        <div class="col-md-2 text-left">
+          <label for="max-hdi"><strong>Max-HDI:</strong></label>
+          <input type="number" id="hdimax" step="0.01" min="0" max="1" class="form-control" name="hmax" value="{{ max_hdi }}" placeholder="Max-HDI.." title="Press << ADD to populate Country / Regions list, value must be between 0 - 1">
+        </div>
+        <!-- selection of groups of countries!
+        <div class="col-md-4 text-left">
+          <label for="group-countries"><strong>Select Groups of Countries:</strong></label>
+          <select id="group-countries" class="form-control" name="group-countries">
+            <option value="test">Test</option>
+          </select>
+        </div> -->
       </div>
     </div>
-
+    
     <div class="row pl-4 pr-4">
       <div class="col-md-6">
         <label for="select-TE-TT"><strong>Technology: Education / Other:</strong></label>
@@ -163,7 +171,7 @@ ETH SPuD - {{ tak }} ; page {{ page_obj.number }}
     <div class="row pl-5 pr-5">
 
       <div class="col-md-2">
-        <input class="form-check-input" type="checkbox" value="1" id="old-search-engine-checkbox" name="search">
+        <input class="form-check-input" type="checkbox" value="1" id="old-search-engine-checkbox" name="search" {% if not search_engine_var %} checked {% endif %}>
         <label class="form-check-label" for="old-search-engine-checkbox">
           Old search type
         </label>
@@ -209,7 +217,8 @@ ETH SPuD - {{ tak }} ; page {{ page_obj.number }}
           {% csrf_token %}
           <input name="auth" type="hidden" value="{{ auth }}">
           <input name="tak" type="hidden" value="{{ tak }}">
-          <input name="year" type="hidden" value="{{ year }}">
+          <input name="ymin" type="hidden" value="{{ ymin }}">
+          <input name="ymax" type="hidden" value="{{ ymax }}">
           <input name="author" type="hidden" value="{{ author }}">
           {% for values in form_gc_gr %}
             <input name="gc/gr" type="hidden" value="{{ values }}">
@@ -244,6 +253,7 @@ ETH SPuD - {{ tak }} ; page {{ page_obj.number }}
           {% for key, values in KEYWORDS_LIST %}
             <li> <span class="mark{{ key }}"></span> {{ key }} </li>
           {% endfor %}
+          <li> <span class="markSearch"></span> Search Query </li>
         </ul>
     </div>
 
@@ -253,21 +263,33 @@ ETH SPuD - {{ tak }} ; page {{ page_obj.number }}
         <table class="table table-bordered">
           <thead>
             <tr class="text-center d-flex">
-              <th class="col-2"> Authors </th>
-              <th class="col-1"> Year </th>
-              <th class="col-2"> Title </th>
-              <th class="col-3"> Abstract </th>
-              <th class="col-2"> Keywords </th>
-              <th class="col-1"> Links </th>
-              <th class="col-1"> Rank </th>
+              <th class="col-1" style="width: 10%;
+              flex: 0 0 10%;max-width: 10%;"> Authors </th>
+              <th class="col-1" style="width: 4%;
+              flex: 0 0 4%;max-width: 4%;"> Year </th>
+              <th class="col-1" style="width: 10%;
+              flex: 0 0 10%;max-width: 10%;"> Title </th>
+              <th class="col-1" style="width: 38%;
+              flex: 0 0 38%;max-width: 38%;"> Abstract </th>
+              <th class="col-1" style="width: 15%;
+              flex: 0 0 15%;max-width: 15%;"> Keywords </th>
+              <th class="col-1" style="width: 15%;
+              flex: 0 0 15%;max-width: 15%;"> Semantic Values </th>
+              <th class="col-1" style="width: 4%;
+              flex: 0 0 4%;max-width: 4%;"> Links </th>
+              <th class="col-1" style="width: 4%;
+              flex: 0 0 4%;max-width: 4%;"> Rank </th>
             </tr>
           </thead>
 
           {% for publication in page_obj %}
             <tr class="d-flex">
-              <td class="col-2"> {{ publication.authors|check_availablity }} </td>
-              <td class="col-1"> {{ publication.year }} </td>
-              <td class="col-2 highlighter">
+              <td class="col-1" style="width: 10%;
+              flex: 0 0 10%;max-width: 10%;"> {{ publication.authors|check_availablity }} </td>
+              <td class="col-1" style="width: 4%;
+              flex: 0 0 4%;max-width: 4%;"> {{ publication.year }} </td>
+              <td class="col-1 highlighter" style="width: 10%;
+              flex: 0 0 10%;max-width: 10%;">
                 <a href="{% url 'showrecord'%}?auth={{ auth }}&importedfrom={{ publication.get_persisted_id | urlencode }}&id={{ publication.id }}&highlight={{ highlight_param }}" target="_blank">
                   {% if highlight_keywords %}
                     {{ publication.title|check_availablity|replace_highlighted }}
@@ -276,21 +298,28 @@ ETH SPuD - {{ tak }} ; page {{ page_obj.number }}
                   {% endif %}
                 </a>
               </td>
-              <td class="col-3 highlighter wrap addReadMore showlesscontent" wordsLmt="{{ ABSTRACT_WORDS_LIMIT }}">
+              <td class="col-1 highlighter wrap addReadMore showlesscontent" wordsLmt="{{ ABSTRACT_WORDS_LIMIT }}"  style="width: 38%;
+              flex: 0 0 38%;max-width: 38%;">
                 {% if highlight_keywords %}
                   {{ publication.abstract|check_availablity|replace_highlighted }}
                 {% else %}
                   {{ publication.abstract|check_availablity }}
                 {% endif %}
               </td>
-              <td class="col-2 highlighter wrap">
+              <td class="col-1 highlighter wrap"  style="width: 15%;
+              flex: 0 0 15%;max-width: 15%;">
                 {% if highlight_keywords %}
                   {{ publication.keywords|check_availablity|replace_highlighted }}
                 {% else %}
                   {{ publication.keywords|check_availablity }}
                 {% endif %}
               </td>
-              <td class="col-1 highlighter wrap">
+              <td class="col-1 wrap"  style="width: 15%;
+              flex: 0 0 15%;max-width: 15%;">
+                {{ publication.semantic_values|check_availablity|make_links }}
+              </td>
+              <td class="col-1 wrap" style="width: 4%;
+              flex: 0 0 4%;max-width: 4%;">
                 {% if publication.doi %}
                   <a href="https://doi.org/{{ publication.doi }}" target="_blank"> {{ publication.doi }} </a>
                   <br><br>
@@ -300,11 +329,14 @@ ETH SPuD - {{ tak }} ; page {{ page_obj.number }}
                   Google Scholar
                 </a>
               </td>
-              <td class="col-1"> {{ publication.relevance.relevance }} </td>
+              <td class="col-1" style="width: 4%;
+              flex: 0 0 4%;max-width: 4%;"> {{ publication.relevance.relevance_normalised }} </td>
             </tr>
           {% endfor %}
 
         </table>
+      </div>  
+    </div>
 
         <div class="d-flex">
           <ul class="pagination mx-auto">
@@ -358,14 +390,9 @@ ETH SPuD - {{ tak }} ; page {{ page_obj.number }}
           <p class="b"> Query: <span class="font-weight-bold"> {{ q__q }} </span> </p>
           <p class="b"> Timestamp: <span class="font-weight-bold"> {{ ""|timestamp }} </span> </p>
         </div>
-
-      </div>
-    </div>
   </main>
 </div>
-</div>
-<div id="loading">
-</div>
+<div id="loading"></div>
 {% endblock content %}
 {% block scripts %}
 <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
@@ -379,7 +406,15 @@ ETH SPuD - {{ tak }} ; page {{ page_obj.number }}
 <script src="{% static 'js/selectize.js' %}"></script>
 
 <script src="{% static 'js/publications.js' %}"></script>
-
+<script>
+$("#divHdi").keypress(
+  function(event){
+    if (event.which == '13') {
+      event.preventDefault();
+      validateHdi();
+    }
+});
+</script>
 <script>
 $('.filters').selectize({
   plugins: ['remove_button'],
@@ -428,25 +463,13 @@ function spinner() {
   }, 1000);
 }
 
-function validate() {
+function validateYear() {
   var ymin = document.getElementById("yearmin").value;
   var ymax = document.getElementById("yearmax").value;
-  var hmin = document.getElementById("hdimin").value;
-  var hmax = document.getElementById("hdimax").value;
-  var currentTime = new Date();
-  var currentyear = currentTime.getFullYear();
-  var regex=/^[0-9]+$/;
   document.getElementById("yearmin").style.borderColor = "black";
   document.getElementById("yearmax").style.borderColor = "black";
-  document.getElementById("hdimin").style.borderColor = "black";
-  document.getElementById("hdimax").style.borderColor = "black";
 
-  if ((hmin !== "") && (hmax !== "") && (hmin > hmax)) {
-    document.getElementById("hdimin").style.borderColor = "red";
-    document.getElementById("hdimax").style.borderColor = "red";
-    showAlertHdiMinMoreThanHdiMax();
-  } 
-  else if ((ymin !== "") && (ymax !== "") && (ymin > ymax)) {
+  if ((ymin !== "") && (ymax !== "") && (ymin > ymax)) {
     document.getElementById("yearmin").style.borderColor = "red";
     document.getElementById("yearmax").style.borderColor = "red";
     showAlertYearMinMoreThanYearMax();
@@ -463,5 +486,245 @@ function topFunction() {
     document.body.scrollTop = 0;
     document.documentElement.scrollTop = 0;
     }
+</script>
+<script>
+  function showAlertHdiMinMoreThanHdiMax() {
+  
+      $('#alert_placeholder').append('<div id="alertdiv" class="alert alert-danger alert-dismissible fade show" role="alert"> HDI min has to be smaller than HDI max. <button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">&times;</span> </button> </div>')
+  
+      setTimeout(function() { // this will automatically close the alert and remove this if the users doesnt close it in 3 secs
+  
+  
+        $("#alertdiv").remove();
+  
+      }, 5000);
+  }
+  
+  function validateHdi() {
+    var hmin = document.getElementById("hdimin").value;
+    var hmax = document.getElementById("hdimax").value;
+    document.getElementById("hdimin").style.borderColor = "black";
+    document.getElementById("hdimax").style.borderColor = "black";
+  
+    if ((hmin !== "") && (hmax !== "") && (hmin > hmax)) {
+      document.getElementById("hdimin").style.borderColor = "red";
+      document.getElementById("hdimax").style.borderColor = "red";
+      showAlertHdiMinMoreThanHdiMax();
+    } 
+    else {
+      GCFilterIterator();
+    }
+  }
+  
+  function GCFilterIterator() {
+    const hdiValues = {
+     "ab": 0.498,
+     "ac": 0.785,
+     "ad": 0.754,
+     "ae": 0.858,
+     "af": 0.581,
+     "ag": 0.78,
+     "ah": 0.825,
+     "ai": 0.755,
+     "ak": 0.939,
+     "al": 0.908,
+     "am": 0.757,
+     "an": 0.807,
+     "ao": 0.846,
+     "ap": 0.608,
+     "aq": 0.8,
+     "ar": 0.808,
+     "as": 0.916,
+     "at": 0.708,
+     "au": 0.515,
+     "av": 0.612,
+     "aw": 0.693,
+     "ax": 0.768,
+     "ay": 0.717,
+     "az": 0.759,
+     "a0": 0.853,
+     "a1": 0.813,
+     "a2": 0.423,
+     "a3": 0.417,
+     "a4": 0.582,
+     "a5": 0.556,
+     "a6": 0.926,
+     "a7": 0.654,
+     "a9": 0.367,
+     "ba": 0.404,
+     "bb": 0.843,
+     "bc": 0.752,
+     "bd": 0.747,
+     "be": 0.503,
+     "bf": 0.457,
+     "bg": 0.606,
+     "bi": 0.794,
+     "bj": 0.492,
+     "bk": 0.831,
+     "bl": 0.777,
+     "bm": 0.869,
+     "bn": 0.888,
+     "bo": 0.929,
+     "bp": 0.476,
+     "bq": 0.736,
+     "br": 0.715,
+     "bs": 0.625,
+     "bt": 0.752,
+     "bu": 0.696,
+     "bv": 0.674,
+     "bw": 0.44,
+     "bx": 0.871,
+     "by": 0.588,
+     "bz": 0.463,
+     "b0": 0.741,
+     "b1": 0.92,
+     "b2": 0.901,
+     "b3": 0.702,
+     "b4": 0.46,
+     "b5": 0.78,
+     "b6": 0.936,
+     "b7": 0.592,
+     "b8": 0.87,
+     "b9": 0.772,
+     "ca": 0.65,
+     "cb": 0.455,
+     "cc": 0.591,
+     "cd": 0.459,
+     "ce": 0.654,
+     "cf": 0.498,
+     "cg": 0.617,
+     "ch": 0.838,
+     "ci": 0.935,
+     "cj": 0.64,
+     "ck": 0.694,
+     "cl": 0.798,
+     "cm": 0.685,
+     "cn": 0.938,
+     "co": 0.903,
+     "cp": 0.88,
+     "cq": 0.732,
+     "cr": 0.909,
+     "cs": 0.735,
+     "ct": 0.8,   
+     "cu": 0.59,
+     "cv": 0.612,
+     "cy": 0.903,
+     "c1": 0.803,
+     "c2": 0.672,
+     "c3": 0.601,
+     "c4": 0.847,
+     "c5": 0.757,
+     "c6": 0.52,
+     "c7": 0.435,
+     "c8": 0.706,
+     "c9": 0.916,
+     "da": 0.858,
+     "db": 0.904,
+     "dc": 0.519,
+     "dd": 0.477,
+     "de": 0.802,
+     "df": 0.717,
+     "dg": 0.427,
+     "dh": 0.878,
+     "di": 0.708,
+     "dj": 0.52,
+     "dk": 0.79,
+     "dl": 0.774,
+     "dm": 0.627,
+     "dn": 0.7,
+     "dq": 0.741,
+     "dr": 0.814,
+     "ds": 0.667,
+     "dt": 0.437,
+     "du": 0.578,
+     "dv": 0.647,
+     "dx": 0.574,
+     "dy": 0.931,
+     "dz": 0.917,
+     "d0": 0.658,
+     "d1": 0.354,
+     "d2": 0.532,
+     "d4": 0.757,
+     "d5": 0.953,
+     "d6": 0.821,
+     "d7": 0.562,
+     "d8": 0.798,
+     "d9": 0.686,
+     "ea": 0.789,
+     "eb": 0.544,
+     "ec": 0.702,
+     "ed": 0.75,
+     "ee": 0.699,
+     "ef": 0.865,
+     "eg": 0.847,
+     "ei": 0.856,
+     "ej": 0.811,
+     "ek": 0.816,
+     "el": 0.524,
+     "eo": 0.747,
+     "ep": 0.723,
+     "eq": 0.713,
+     "es": 0.589,
+     "et": 0.853,
+     "eu": 0.505,
+     "ev": 0.787,
+     "ew": 0.797,
+     "ex": 0.419,
+     "ey": 0.932,
+     "ez": 0.855,
+     "e0": 0.896,
+     "e1": 0.546,
+     "e4": 0.699,
+     "e5": 0.903,
+     "e7": 0.388,
+     "e8": 0.891,
+     "e9": 0.77,
+     "fa": 0.502,
+     "fb": 0.72,
+     "fc": 0.933,
+     "fd": 0.944,
+     "fe": 0.536,
+     "ff": 0.65,
+     "fg": 0.538,
+     "fh": 0.755,
+     "fj": 0.503,
+     "fk": 0.726,
+     "fl": 0.784,
+     "fm": 0.735,
+     "fn": 0.791,
+     "fo": 0.706,
+     "fq": 0.516,
+     "fr": 0.751,
+     "fs": 0.863,
+     "ft": 0.922,
+     "fu": 0.924,
+     "fv": 0.804,
+     "fw": 0.71,
+     "fx": 0.603,
+     "fz": 0.761,
+     "f0": 0.694,
+     "f1": 0.452,
+     "f2": 0.588,
+     "f3": 0.535
+    }
+    
+    var filterSelectedValues = $('#select-GC').val();
+    var entries = Object.entries(hdiValues);
+    var hmin = document.getElementById("hdimin").value;
+    var hmax = document.getElementById("hdimax").value;
+    var control = $('#select-GC')[0].selectize;
+  
+    for (var [hdiName, hdiValue] of entries) {
+      var n = filterSelectedValues.includes(hdiName);
+      if ((n == false) && (hmin <= hdiValue) && (hmax >= hdiValue))
+        control.addItem(hdiName);
+    }
+  }
+</script>
+<script>
+$(function() {
+  var words = document.getElementById("queryInput").value.toLowerCase().replace(/ or/g,"").replace(/ and/g,"").replace(/"/g,'');
+  $(".highlighter").mark(words);
+})
 </script>
 {% endblock scripts %}

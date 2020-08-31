@@ -9,4 +9,5 @@ urlpatterns = [
     path('ris_export/', views.ris_export, name='ris_export'),
     path('zotero_export/', views.zotero_export, name='zotero_export'),
     path('keywords/', views.keywords, name='keywords'),
+    path('detail/<str:word>/', views.detail, name='detail'),
 ]
